@@ -5,8 +5,8 @@ import numpy as np
 import rdkit.Chem.Descriptors as dsc
 from rdkit import Chem
 from util import util
-from mendeleev import get_table
-
+#from mendeleev import get_table
+from mendeleev.fetch import fetch_table
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 sel_prop_names = ['atomic_weight',
@@ -18,7 +18,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 3
+dim_self_feat = 7
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -38,9 +38,12 @@ class molDGLGraph(dgl.DGLGraph):
 
 
 def read_atom_prop():
-    tb_atomic_props = get_table('elements')
-    arr_atomic_nums = np.array(tb_atomic_props['atomic_number'], dtype=np.int)
-    arr_atomic_props = np.nan_to_num(np.array(tb_atomic_props[sel_prop_names], dtype=np.float32))
+#    tb_atomic_props = get_table('elements')
+    tb_atomic_props = fetch_table('elements')
+#    arr_atomic_nums = np.array(tb_atomic_props['atomic_number'], dtype=np.int)
+    arr_atomic_nums = np.array(tb_atomic_props['atomic_number'], dtype=int)
+#    arr_atomic_props = np.nan_to_num(np.array(tb_atomic_props[sel_prop_names], dtype=np.float32))
+    arr_atomic_props = np.nan_to_num(np.array(tb_atomic_props[sel_prop_names], dtype=float))
     arr_atomic_props = util.zscore(arr_atomic_props)
     atomic_props_mat = {arr_atomic_nums[i]: arr_atomic_props[i, :] for i in range(0, arr_atomic_nums.shape[0])}
 
@@ -106,7 +109,8 @@ def read_dataset(file_name):
     mol_graphs = []
     data_mat = np.array(pandas.read_csv(file_name))
     smiles = data_mat[:, 0]
-    target = np.array(data_mat[:, 1:3], dtype=np.float)
+#    target = np.array(data_mat[:, 1:3], dtype=np.float)
+    target = np.array(data_mat[:, 1:3], dtype=float)
 
     for i in range(0, data_mat.shape[0]):
         mol, mol_graph = smiles_to_mol_graph(smiles[i])

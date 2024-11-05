@@ -44,25 +44,21 @@ class Net(nn.Module):
 
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
-        self.fc1 = nn.Linear(20 + dim_self_feat, 10)
+        self.fc1 = nn.Linear(20 * dim_self_feat, 10)
         self.fc2 = nn.Linear(10, dim_out)
 
-        # 테스트
-        self.num_nodes = None  # 노드 수를 저장할 속성 추가
-        # 테스트
-
     def forward(self, g, self_feat):
-
-        # 테스트
-        self.num_nodes = g.number_of_nodes()
-        # 테스트
-
         h = F.relu(self.gc1(g, g.ndata['feat']))
         h = F.relu(self.gc2(g, h))
         g.ndata['h'] = h
-
+        
         hg = dgl.mean_nodes(g, 'h')
-        hg = torch.cat((hg, self_feat), dim=1)
+        
+        new_hg = []
+        for i in range(hg.shape[0]):
+            matmul_result = torch.mm(hg[i].unsqueeze(0).T, self_feat[i].unsqueeze(0))
+            new_hg.append(matmul_result.flatten())
+        hg = torch.stack(new_hg)
 
         out = F.relu(self.fc1(hg))
         out = self.fc2(out)

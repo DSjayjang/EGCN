@@ -5,7 +5,8 @@ import torch.nn.functional as F
 import dgl
 
 
-msg = fn.copy_src(src='h', out='m')
+#msg = fn.copy_src(src='h', out='m')
+msg = fn.copy_u('h', 'm')
 
 
 def reduce(nodes):
