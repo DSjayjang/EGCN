@@ -9,13 +9,27 @@ from model import EGCN
 from model import Extended_EGCN
 from util import trainer
 
+# 재현성-난수 고정
+import os
+#import tensorflow as tf
+
+SEED = 100
+
+os.environ['PYTHONHASHSEED'] = str(SEED)
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+#tf.random.set_seed(SEED)
+
 
 # check GPU availability
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # experiment parameters
-dataset_name = 'esol'
+dataset_name = 'qm7'
 batch_size = 32
 max_epochs = 300
 k = 5
@@ -118,7 +132,7 @@ test_losses['Extended_EGCN'] = trainer.cross_validation(dataset, model_Extended_
 print('test loss (Extended_EGCN): ' + str(test_losses['Extended_EGCN']))
 
 # 테스트
-print(f'Dimension of EGCN: {batch_size} x {model_EGCN.fc1.in_features}')
-print(f'Dimension of Extended_EGCN: {batch_size} x {model_Extended_EGCN.fc1.in_features}')
+#print(f'Dimension of EGCN: {batch_size} x {model_EGCN.fc1.in_features}')
+#print(f'Dimension of Extended_EGCN: {batch_size} x {model_Extended_EGCN.fc1.in_features}')
 
 print(test_losses)

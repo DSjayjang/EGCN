@@ -54,6 +54,7 @@ class Net(nn.Module):
         
         hg = dgl.mean_nodes(g, 'h')
         
+        ## 함수로 정의하면 좋을 것 같음
         new_hg = []
         for i in range(hg.shape[0]):
             matmul_result = torch.mm(hg[i].unsqueeze(0).T, self_feat[i].unsqueeze(0))

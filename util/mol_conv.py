@@ -122,7 +122,8 @@ def read_dataset(file_name):
 
             mol_graph.max_abs_charge = dsc.MaxAbsPartialCharge(mol)
             mol_graph.min_abs_charge = dsc.MinAbsPartialCharge(mol)
-            mol_graph.num_rad_elc = dsc.NumValenceElectrons(mol)
+#            mol_graph.num_rad_elc = dsc.NumValenceElectrons(mol)
+            mol_graph.num_rad_elc = dsc.NumRadicalElectrons(mol)
             mol_graph.num_val_elc = dsc.NumValenceElectrons(mol)
 
             samples.append((mol_graph, target[i]))
