@@ -39,41 +39,25 @@ class GCNLayer(nn.Module):
 
 
 class Net(nn.Module):
-    def __init__(self, dim_in, dim_out, dim_self_feat):
+    def __init__(self, dim_in, dim_out, dim_self_feat, dim_bilinear=50):
         super(Net, self).__init__()
 
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
-        self.fc1 = nn.Linear(20 * dim_self_feat, 10)
+        self.bilinear = nn.Bilinear(20, dim_self_feat, dim_bilinear)
+        self.fc1 = nn.Linear(dim_bilinear, 10)
         self.fc2 = nn.Linear(10, dim_out)
 
     def forward(self, g, self_feat):
+
         h = F.relu(self.gc1(g, g.ndata['feat']))
         h = F.relu(self.gc2(g, h))
         g.ndata['h'] = h
-        
+
         hg = dgl.mean_nodes(g, 'h')
-        
-        ## 함수로 정의하면 좋을 것 같음
-        new_hg = []
-        for i in range(hg.shape[0]):
-            matmul_result = torch.mm(hg[i].unsqueeze(0).T, self_feat[i].unsqueeze(0))
-            new_hg.append(matmul_result.flatten())
-        hg = torch.stack(new_hg)
+        hg = self.bilinear(hg, self_feat)
 
-        # hg = hg.unsqueeze(2)
-        # self_feat = self_feat.unsqueeze(1)
-        # """
-        # torch.bmm()은 두 개의 3차원 텐서를 입력받음
-        # 이 텐서들은 각각 (b, n, m)과 (b, m, p)의 형태
-        # b는 배치 크기, n, m, p는 각 행렬의 차원을 나타냅니다.
-        # 출력: (b, n, p) 형태의 3차원 텐서를 출력
-        # """
-        # hg = torch.bmm(hg, self_feat) 
-        # hg = hg.view(hg.size(0), -1)
-
-
-
+    
         out = F.relu(self.fc1(hg))
         out = self.fc2(out)
 

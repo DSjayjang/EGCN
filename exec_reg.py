@@ -7,6 +7,7 @@ import util.mol_conv as mc
 from model import GCN
 from model import EGCN
 from model import Extended_EGCN
+from model import hjh_EGCN
 from util import trainer
 
 # 재현성-난수 고정
@@ -29,7 +30,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # experiment parameters
-dataset_name = 'qm7'
+dataset_name = 'esol'
 batch_size = 32
 max_epochs = 300
 k = 5
@@ -79,11 +80,32 @@ def collate_emodel(samples):
         self_feats[i, 2] = mol_graph.num_rings
 
         # 추가
-        self_feats[i, 3] = mol_graph.max_abs_charge
-        self_feats[i, 4] = mol_graph.min_abs_charge
-        self_feats[i, 5] = mol_graph.num_rad_elc
-        self_feats[i, 6] = mol_graph.num_val_elc
-        # 추가
+        # self_feats[i, 3] = mol_graph.max_abs_charge
+        # self_feats[i, 4] = mol_graph.min_abs_charge
+        # self_feats[i, 5] = mol_graph.num_rad_elc
+        # self_feats[i, 6] = mol_graph.num_val_elc
+        # # 추가
+        self_feats[i, 3] = mol_graph.num_rad_elc
+        self_feats[i, 4] = mol_graph.num_val_elc
+
+        # 새로 추가
+        self_feats[i, 5] = mol_graph.NHOHCount
+        self_feats[i, 6] = mol_graph.BertzCT
+        self_feats[i, 7] = mol_graph.TPSA
+        self_feats[i, 8] = mol_graph.fr_halogen
+        self_feats[i, 9] = mol_graph.fr_amide
+        self_feats[i, 10] = mol_graph.MolLogP
+        self_feats[i, 11] = mol_graph.SMR_VSA10
+        self_feats[i, 12] = mol_graph.EState_VSA5
+        self_feats[i, 13] = mol_graph.SMR_VSA6
+        self_feats[i, 14] = mol_graph.EState_VSA1
+        self_feats[i, 15] = mol_graph.BCUT2D_LOGPHI
+        self_feats[i, 16] = mol_graph.VSA_EState8
+        self_feats[i, 17] = mol_graph.PEOE_VSA6
+        self_feats[i, 18] = mol_graph.VSA_EState9
+        self_feats[i, 19] = mol_graph.PEOE_VSA5
+        # 새로 추가
+
 
     graphs, labels = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
@@ -100,6 +122,7 @@ random.shuffle(dataset)
 #model_GCN = GCN.Net(mc.dim_atomic_feat, 1).to(device)
 model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 model_Extended_EGCN = Extended_EGCN.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
+model_hjh_EGCN = hjh_EGCN.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 #model_EGCN_S = EGCN.Net(mc.dim_atomic_feat, 1, 2).to(device)
 #model_EGCN_R = EGCN.Net(mc.dim_atomic_feat, 1, 1).to(device)
 
@@ -123,13 +146,17 @@ test_losses = dict()
 # test_losses['EGCN_R'] = trainer.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_ring)
 # print('test loss (EGCN_RING): ' + str(test_losses['EGCN_R']))
 
-print('--------- EGCN ---------')
-test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
-print('test loss (EGCN): ' + str(test_losses['EGCN']))
+# print('--------- EGCN ---------')
+# test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
+# print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
 print('--------- Exteded EGCN ---------')
 test_losses['Extended_EGCN'] = trainer.cross_validation(dataset, model_Extended_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
 print('test loss (Extended_EGCN): ' + str(test_losses['Extended_EGCN']))
+
+# print('--------- hjh EGCN ---------')
+# test_losses['hjh_EGCN'] = trainer.cross_validation(dataset, model_hjh_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
+# print('test loss (hjh_EGCN): ' + str(test_losses['hjh_EGCN']))
 
 # 테스트
 #print(f'Dimension of EGCN: {batch_size} x {model_EGCN.fc1.in_features}')
