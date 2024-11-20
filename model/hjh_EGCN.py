@@ -39,13 +39,12 @@ class GCNLayer(nn.Module):
 
 
 class Net(nn.Module):
-    def __init__(self, dim_in, dim_out, dim_self_feat, dim_bilinear=50):
+    def __init__(self, dim_in, dim_out, dim_self_feat, dim_bilinear = 50):
         super(Net, self).__init__()
-
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
         self.bilinear = nn.Bilinear(20, dim_self_feat, dim_bilinear)
-        self.fc1 = nn.Linear(dim_bilinear, 10)
+        self.fc1 = nn.Linear(dim_bilinear, 10) # dim_bilinear x 10 : mat2
         self.fc2 = nn.Linear(10, dim_out)
 
     def forward(self, g, self_feat):
@@ -55,8 +54,8 @@ class Net(nn.Module):
         g.ndata['h'] = h
 
         hg = dgl.mean_nodes(g, 'h')
-        hg = self.bilinear(hg, self_feat)
-
+        hg = self.bilinear(hg, self_feat) # 32 x 50 : mat1
+#        print('★★★★★ hg:', hg.shape)
     
         out = F.relu(self.fc1(hg))
         out = self.fc2(out)

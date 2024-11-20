@@ -18,7 +18,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 20
+dim_self_feat = 10
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -142,6 +142,10 @@ def read_dataset(file_name):
             mol_graph.PEOE_VSA6 = dsc.PEOE_VSA6(mol)
             mol_graph.VSA_EState9 = dsc.VSA_EState9(mol)
             mol_graph.PEOE_VSA5 = dsc.PEOE_VSA5(mol)
+
+            mol_graph.EState_VSA9 = dsc.EState_VSA9(mol)
+            mol_graph.SlogP_VSA2 = dsc.SlogP_VSA2(mol)
+            mol_graph.BCUT2D_LOGPLOW = dsc.BCUT2D_LOGPLOW(mol)
             # 새로 추가
             
             samples.append((mol_graph, target[i]))
@@ -171,6 +175,10 @@ def read_dataset(file_name):
     normalize_self_feat(mol_graphs, 'PEOE_VSA6')
     normalize_self_feat(mol_graphs, 'VSA_EState9')
     normalize_self_feat(mol_graphs, 'PEOE_VSA5')
+
+    normalize_self_feat(mol_graphs, 'EState_VSA9')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA2')
+    normalize_self_feat(mol_graphs, 'BCUT2D_LOGPLOW')
 
     return samples
 

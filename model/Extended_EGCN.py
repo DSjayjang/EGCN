@@ -60,7 +60,7 @@ class Net(nn.Module):
             matmul_result = torch.mm(hg[i].unsqueeze(0).T, self_feat[i].unsqueeze(0))
             new_hg.append(matmul_result.flatten())
         hg = torch.stack(new_hg)
-
+#        print('★★★★★ hg:', hg.shape)
         # hg = hg.unsqueeze(2)
         # self_feat = self_feat.unsqueeze(1)
         # """
