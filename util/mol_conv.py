@@ -18,7 +18,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 10
+dim_self_feat = 9
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -116,69 +116,78 @@ def read_dataset(file_name):
         mol, mol_graph = smiles_to_mol_graph(smiles[i])
 
         if mol is not None and mol_graph is not None:
-            mol_graph.num_atoms = mol.GetNumAtoms()
-            mol_graph.weight = dsc.ExactMolWt(mol)
-            mol_graph.num_rings = mol.GetRingInfo().NumRings()
 
-            mol_graph.max_abs_charge = dsc.MaxAbsPartialCharge(mol)
-            mol_graph.min_abs_charge = dsc.MinAbsPartialCharge(mol)
-#            mol_graph.num_rad_elc = dsc.NumValenceElectrons(mol)
-            mol_graph.num_rad_elc = dsc.NumRadicalElectrons(mol)
-            mol_graph.num_val_elc = dsc.NumValenceElectrons(mol)
+            ####################################################
+            # default
+            # don't touch
+            # mol_graph.num_atoms = mol.GetNumAtoms()
+            # mol_graph.weight = dsc.ExactMolWt(mol)
+            # mol_graph.num_rings = mol.GetRingInfo().NumRings()
 
-            # 새로 추가
-            mol_graph.NHOHCount = dsc.NHOHCount(mol)
-            mol_graph.BertzCT = dsc.BertzCT(mol)
+            # mol_graph.max_abs_charge = dsc.MaxAbsPartialCharge(mol)
+            # mol_graph.min_abs_charge = dsc.MinAbsPartialCharge(mol)
+            # mol_graph.num_rad_elc = dsc.NumValenceElectrons(mol) # 잘못된 것
+            # mol_graph.num_rad_elc = dsc.NumRadicalElectrons(mol)
+            # mol_graph.num_val_elc = dsc.NumValenceElectrons(mol)
+            ####################################################
+ 
+            mol_graph.HeavyAtomCount = dsc.HeavyAtomCount(mol) # Ok
+            mol_graph.SlogP_VSA2 = dsc.SlogP_VSA2(mol) # Ok
+            mol_graph.BertzCT = dsc.BertzCT(mol) # Ok
+            mol_graph.fr_C_O_noCOO = dsc.fr_C_O_noCOO(mol)
+            mol_graph.NumSaturatedCarbocycles = dsc.NumSaturatedCarbocycles(mol) # Ok
+            mol_graph.EState_VSA10 = dsc.EState_VSA10(mol) # Ok
+            mol_graph.MinPartialCharge = dsc.MinPartialCharge(mol) # 안됨
             mol_graph.TPSA = dsc.TPSA(mol)
-            mol_graph.fr_halogen = dsc.fr_halogen(mol)
-            mol_graph.fr_amide = dsc.fr_amide(mol)
-            mol_graph.MolLogP = dsc.MolLogP(mol)
-            mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
-            mol_graph.EState_VSA5 = dsc.EState_VSA5(mol)
-            mol_graph.SMR_VSA6 = dsc.SMR_VSA6(mol)
-            mol_graph.EState_VSA1 = dsc.EState_VSA1(mol)
-            mol_graph.BCUT2D_LOGPHI = dsc.BCUT2D_LOGPHI(mol)
-            mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
-            mol_graph.PEOE_VSA6 = dsc.PEOE_VSA6(mol)
-            mol_graph.VSA_EState9 = dsc.VSA_EState9(mol)
-            mol_graph.PEOE_VSA5 = dsc.PEOE_VSA5(mol)
+            mol_graph.MolMR = dsc.MolMR(mol)
+   
+            # # 새로 추가
+            # mol_graph.NHOHCount = dsc.NHOHCount(mol)
+            # mol_graph.BertzCT = dsc.BertzCT(mol)
+            # mol_graph.TPSA = dsc.TPSA(mol)
+            # mol_graph.fr_halogen = dsc.fr_halogen(mol)
+            # mol_graph.fr_amide = dsc.fr_amide(mol)
+            # mol_graph.MolLogP = dsc.MolLogP(mol)
+            # mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
+            # mol_graph.EState_VSA5 = dsc.EState_VSA5(mol)
+            # mol_graph.SMR_VSA6 = dsc.SMR_VSA6(mol)
+            # mol_graph.EState_VSA1 = dsc.EState_VSA1(mol)
+            # mol_graph.BCUT2D_LOGPHI = dsc.BCUT2D_LOGPHI(mol)
+            # mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
+            # mol_graph.PEOE_VSA6 = dsc.PEOE_VSA6(mol)
+            # mol_graph.VSA_EState9 = dsc.VSA_EState9(mol)
+            # mol_graph.PEOE_VSA5 = dsc.PEOE_VSA5(mol)
 
-            mol_graph.EState_VSA9 = dsc.EState_VSA9(mol)
-            mol_graph.SlogP_VSA2 = dsc.SlogP_VSA2(mol)
-            mol_graph.BCUT2D_LOGPLOW = dsc.BCUT2D_LOGPLOW(mol)
-            # 새로 추가
+            # mol_graph.EState_VSA9 = dsc.EState_VSA9(mol)
+            # mol_graph.SlogP_VSA2 = dsc.SlogP_VSA2(mol)
+            # mol_graph.BCUT2D_LOGPLOW = dsc.BCUT2D_LOGPLOW(mol)
+            # # 새로 추가
             
             samples.append((mol_graph, target[i]))
             mol_graphs.append(mol_graph)
+    ####################################################
+    # default
+    # don't touch
+    # normalize_self_feat(mol_graphs, 'num_atoms')
+    # normalize_self_feat(mol_graphs, 'weight')
+    # normalize_self_feat(mol_graphs, 'num_rings')
 
-    normalize_self_feat(mol_graphs, 'num_atoms')
-    normalize_self_feat(mol_graphs, 'weight')
-    normalize_self_feat(mol_graphs, 'num_rings')
-    normalize_self_feat(mol_graphs, 'max_abs_charge')
-    normalize_self_feat(mol_graphs, 'min_abs_charge')
-    normalize_self_feat(mol_graphs, 'num_rad_elc')
-    normalize_self_feat(mol_graphs, 'num_val_elc')
+    # normalize_self_feat(mol_graphs, 'max_abs_charge')
+    # normalize_self_feat(mol_graphs, 'min_abs_charge')
+    # normalize_self_feat(mol_graphs, 'num_rad_elc')
+    # normalize_self_feat(mol_graphs, 'num_val_elc')
+    ####################################################
 
     # 새로 추가
-    normalize_self_feat(mol_graphs, 'NHOHCount')
-    normalize_self_feat(mol_graphs, 'BertzCT')
-    normalize_self_feat(mol_graphs, 'TPSA')
-    normalize_self_feat(mol_graphs, 'fr_halogen')
-    normalize_self_feat(mol_graphs, 'fr_amide')
-    normalize_self_feat(mol_graphs, 'MolLogP')
-    normalize_self_feat(mol_graphs, 'SMR_VSA10')
-    normalize_self_feat(mol_graphs, 'EState_VSA5')
-    normalize_self_feat(mol_graphs, 'SMR_VSA6')
-    normalize_self_feat(mol_graphs, 'EState_VSA1')
-    normalize_self_feat(mol_graphs, 'BCUT2D_LOGPHI')
-    normalize_self_feat(mol_graphs, 'VSA_EState8')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA6')
-    normalize_self_feat(mol_graphs, 'VSA_EState9')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA5')
-
-    normalize_self_feat(mol_graphs, 'EState_VSA9')
+    normalize_self_feat(mol_graphs, 'HeavyAtomCount')
     normalize_self_feat(mol_graphs, 'SlogP_VSA2')
-    normalize_self_feat(mol_graphs, 'BCUT2D_LOGPLOW')
+    normalize_self_feat(mol_graphs, 'BertzCT')
+    normalize_self_feat(mol_graphs, 'fr_C_O_noCOO')
+    normalize_self_feat(mol_graphs, 'NumSaturatedCarbocycles')
+    normalize_self_feat(mol_graphs, 'EState_VSA10')
+    normalize_self_feat(mol_graphs, 'MinPartialCharge')
+    normalize_self_feat(mol_graphs, 'TPSA')
+    normalize_self_feat(mol_graphs, 'MolMR')
 
     return samples
 
