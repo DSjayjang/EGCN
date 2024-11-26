@@ -55,7 +55,6 @@ class Net(nn.Module):
 
         hg = dgl.mean_nodes(g, 'h')
         hg = torch.cat((hg, self_feat), dim=1)
-#        print('★★★★★ hg:', hg.shape)
         
         out = F.relu(self.fc1(hg))
         out = self.fc2(out)
