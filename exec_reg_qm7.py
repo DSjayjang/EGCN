@@ -3,7 +3,7 @@ import torch.nn as nn
 import dgl
 import random
 import numpy as np
-import util.mol_conv_logvp as mc
+import util.mol_conv_qm7 as mc
 from model import GCN
 
 from model import EGCN
@@ -44,10 +44,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'logVP2'
+dataset_name = 'qm7_reduced'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):
@@ -58,10 +58,10 @@ def collate(samples):
 
 
 """
-logVP2 용
+qm7_reduced
 """
 ########################################################################################################
-# logVP2
+# qm7_reduced
 # don't touch
 def collate_emodel_Extended_3(samples):
     self_feats = np.empty((len(samples), 3), dtype=np.float32)
@@ -70,11 +70,11 @@ def collate_emodel_Extended_3(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
+        # qm7_reduced
         # 3
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.EState_VSA10
-        self_feats[i, 2] = mol_graph.HeavyAtomCount
+        self_feats[i, 0] = mol_graph.Chi1n
+        self_feats[i, 1] = mol_graph.Chi1v
+        self_feats[i, 2] = mol_graph.Chi0v
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -90,14 +90,14 @@ def collate_emodel_Extended_5(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
+        # qm7_reduced
         # 3
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.EState_VSA10
-        self_feats[i, 2] = mol_graph.HeavyAtomCount
+        self_feats[i, 0] = mol_graph.Chi1n
+        self_feats[i, 1] = mol_graph.Chi1v
+        self_feats[i, 2] = mol_graph.Chi0v
         # 5
-        self_feats[i, 3] = mol_graph.VSA_EState8
-        self_feats[i, 4] = mol_graph.fr_benzene
+        self_feats[i, 3] = mol_graph.MaxPartialCharge
+        self_feats[i, 4] = mol_graph.Kappa2
         ####################################################
     graphs, labels = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
@@ -112,17 +112,17 @@ def collate_emodel_Extended_7(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
+        # qm7_reduced
         # 3
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.EState_VSA10
-        self_feats[i, 2] = mol_graph.HeavyAtomCount
+        self_feats[i, 0] = mol_graph.Chi1n
+        self_feats[i, 1] = mol_graph.Chi1v
+        self_feats[i, 2] = mol_graph.Chi0v
         # 5
-        self_feats[i, 3] = mol_graph.VSA_EState8
-        self_feats[i, 4] = mol_graph.fr_benzene
+        self_feats[i, 3] = mol_graph.MaxPartialCharge
+        self_feats[i, 4] = mol_graph.Kappa2
         # 7
-        self_feats[i, 5] = mol_graph.VSA_EState1
-        self_feats[i, 6] = mol_graph.VSA_EState6
+        self_feats[i, 5] = mol_graph.SlogP_VSA4
+        self_feats[i, 6] = mol_graph.EState_VSA9
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -138,21 +138,21 @@ def collate_emodel_Extended_10(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
+        # qm7_reduced
         # 3
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.EState_VSA10
-        self_feats[i, 2] = mol_graph.HeavyAtomCount
+        self_feats[i, 0] = mol_graph.Chi1n
+        self_feats[i, 1] = mol_graph.Chi1v
+        self_feats[i, 2] = mol_graph.Chi0v
         # 5
-        self_feats[i, 3] = mol_graph.VSA_EState8
-        self_feats[i, 4] = mol_graph.fr_benzene
+        self_feats[i, 3] = mol_graph.MaxPartialCharge
+        self_feats[i, 4] = mol_graph.Kappa2
         # 7
-        self_feats[i, 5] = mol_graph.VSA_EState1
-        self_feats[i, 6] = mol_graph.VSA_EState6
+        self_feats[i, 5] = mol_graph.SlogP_VSA4
+        self_feats[i, 6] = mol_graph.EState_VSA9
         # 10
-        self_feats[i, 7] = mol_graph.MolWt
-        self_feats[i, 8] = mol_graph.EState_VSA1
-        self_feats[i, 9] = mol_graph.fr_COO2
+        self_feats[i, 7] = mol_graph.VSA_EState2
+        self_feats[i, 8] = mol_graph.PEOE_VSA4
+        self_feats[i, 9] = mol_graph.SlogP_VSA3
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -168,33 +168,34 @@ def collate_emodel_Extended_20(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
+        # qm7_reduced
         # 3
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.EState_VSA10
-        self_feats[i, 2] = mol_graph.HeavyAtomCount
+        self_feats[i, 0] = mol_graph.Chi1n
+        self_feats[i, 1] = mol_graph.Chi1v
+        self_feats[i, 2] = mol_graph.Chi0v
         # 5
-        self_feats[i, 3] = mol_graph.VSA_EState8
-        self_feats[i, 4] = mol_graph.fr_benzene
+        self_feats[i, 3] = mol_graph.MaxPartialCharge
+        self_feats[i, 4] = mol_graph.Kappa2
         # 7
-        self_feats[i, 5] = mol_graph.VSA_EState1
-        self_feats[i, 6] = mol_graph.VSA_EState6
+        self_feats[i, 5] = mol_graph.SlogP_VSA4
+        self_feats[i, 6] = mol_graph.EState_VSA9
         # 10
-        self_feats[i, 7] = mol_graph.MolWt
-        self_feats[i, 8] = mol_graph.EState_VSA1
-        self_feats[i, 9] = mol_graph.fr_COO2
+        self_feats[i, 7] = mol_graph.VSA_EState2
+        self_feats[i, 8] = mol_graph.PEOE_VSA4
+        self_feats[i, 9] = mol_graph.SlogP_VSA3
         # 20
-        self_feats[i, 10] = mol_graph.Kappa2
-        self_feats[i, 11] = mol_graph.NumAliphaticRings
-        self_feats[i, 12] = mol_graph.NumSaturatedRings
-        self_feats[i, 13] = mol_graph.PEOE_VSA12
-        self_feats[i, 14] = mol_graph.SlogP_VSA1
-        self_feats[i, 15] = mol_graph.fr_Ar_NH
-        self_feats[i, 16] = mol_graph.fr_azo
-        self_feats[i, 17] = mol_graph.fr_methoxy
-        self_feats[i, 18] = mol_graph.fr_pyridine
+        self_feats[i, 10] = mol_graph.BCUT2D_MRLOW
+        self_feats[i, 11] = mol_graph.PEOE_VSA11
+        self_feats[i, 12] = mol_graph.SlogP_VSA8
+        self_feats[i, 13] = mol_graph.EState_VSA7
+        self_feats[i, 14] = mol_graph.fr_Ndealkylation1
+        self_feats[i, 15] = mol_graph.SMR_VSA5
+        self_feats[i, 16] = mol_graph.fr_epoxide
+        self_feats[i, 17] = mol_graph.fr_NH1
+        self_feats[i, 18] = mol_graph.VSA_EState7
         self_feats[i, 19] = mol_graph.qed
         ####################################################
+
 
     graphs, labels = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
@@ -266,10 +267,10 @@ test_losses = dict()
 
 
 # Extended_EGCN
-# # feature 3개
-# print('--------- Exteded EGCN_3 ---------')
-# test_losses['Extended_EGCN_3'] = trainer.cross_validation(dataset, model_Extended_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
-# print('test loss (Extended_EGCN_3): ' + str(test_losses['Extended_EGCN_3']))
+# feature 3개
+print('--------- Exteded EGCN_3 ---------')
+test_losses['Extended_EGCN_3'] = trainer.cross_validation(dataset, model_Extended_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
+print('test loss (Extended_EGCN_3): ' + str(test_losses['Extended_EGCN_3']))
 
 # # feature 5개
 # print('--------- Exteded EGCN_5 ---------')
@@ -286,10 +287,10 @@ test_losses = dict()
 # test_losses['Extended_EGCN_10'] = trainer.cross_validation(dataset, model_Extended_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_10)
 # print('test loss (Extended_EGCN_10): ' + str(test_losses['Extended_EGCN_10']))
 
-# feature 20개
-print('--------- Exteded EGCN_20 ---------')
-test_losses['Extended_EGCN_20'] = trainer.cross_validation(dataset, model_Extended_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
-print('test loss (Extended_EGCN_20): ' + str(test_losses['Extended_EGCN_20']))
+# # feature 20개
+# print('--------- Exteded EGCN_20 ---------')
+# test_losses['Extended_EGCN_20'] = trainer.cross_validation(dataset, model_Extended_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+# print('test loss (Extended_EGCN_20): ' + str(test_losses['Extended_EGCN_20']))
 
 
 #=====================================================================#
