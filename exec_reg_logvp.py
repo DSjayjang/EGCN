@@ -259,10 +259,10 @@ test_losses = dict()
 # test_losses['EGCN_10'] = trainer.cross_validation(dataset, model_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_10)
 # print('test loss (EGCN_10): ' + str(test_losses['EGCN_10']))
 
-# feature 20개
-print('--------- EGCN_20 ---------')
-test_losses['EGCN_20'] = trainer.cross_validation(dataset, model_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
-print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
+# # feature 20개
+# print('--------- EGCN_20 ---------')
+# test_losses['EGCN_20'] = trainer.cross_validation(dataset, model_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+# print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
 
 
 # Extended_EGCN
