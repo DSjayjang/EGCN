@@ -187,8 +187,8 @@ def collate_emodel_Extended_20(samples):
         self_feats[i, 10] = mol_graph.BertzCT
         self_feats[i, 11] = mol_graph.PEOE_VSA4
         self_feats[i, 12] = mol_graph.Kappa1
-        self_feats[i, 13] = mol_graph.MolLogP
-        self_feats[i, 14] = mol_graph.fr_Ndealkylation1
+        self_feats[i, 13] = mol_graph.NumSaturatedCarbocycles
+        self_feats[i, 14] = mol_graph.MolLogP
         self_feats[i, 15] = mol_graph.BalabanJ
         self_feats[i, 16] = mol_graph.SlogP_VSA10
         self_feats[i, 17] = mol_graph.VSA_EState4
@@ -201,7 +201,6 @@ def collate_emodel_Extended_20(samples):
 
     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
 ########################################################################################################
-
 
 # load train, validation, and test datasets
 print('Data loading...')
