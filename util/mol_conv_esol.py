@@ -146,6 +146,35 @@ def read_dataset(file_name):
             mol_graph.fr_C_O_noCOO = dsc.fr_C_O_noCOO(mol)
             ####################################################
 
+            # ####################################################
+            # # esol
+            # # 3
+            # mol_graph.MolLogP = dsc.MolLogP(mol)
+            # mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
+            # mol_graph.MaxEStateIndex = dsc.MaxEStateIndex(mol)
+            # # 5
+            # mol_graph.MaxAbsPartialCharge = dsc.MaxAbsPartialCharge(mol)
+            # mol_graph.BCUT2D_CHGHI = dsc.BCUT2D_CHGHI(mol)
+            # # 7
+            # mol_graph.BCUT2D_MWLOW = dsc.BCUT2D_MWLOW(mol)
+            # mol_graph.fr_imide = dsc.fr_imide(mol)
+            # # 10
+            # mol_graph.Kappa2 = dsc.Kappa2(mol)
+            # mol_graph.MinAbsPartialCharge = dsc.MinAbsPartialCharge(mol)
+            # mol_graph.NumAromaticHeterocycles = dsc.NumAromaticHeterocycles(mol)
+            # # 20
+            # mol_graph.SlogP_VSA1 = dsc.SlogP_VSA1(mol)
+            # mol_graph.fr_amide = dsc.fr_amide(mol)
+            # mol_graph.BalabanJ = dsc.BalabanJ(mol)
+            # mol_graph.fr_Ar_NH = dsc.fr_Ar_NH(mol)
+            # mol_graph.PEOE_VSA8 = dsc.PEOE_VSA8(mol)
+            # mol_graph.NumSaturatedRings = dsc.NumSaturatedRings(mol)
+            # mol_graph.fr_NH0 = dsc.fr_NH0(mol)
+            # mol_graph.PEOE_VSA13 = dsc.PEOE_VSA13(mol)
+            # mol_graph.fr_barbitur = dsc.fr_barbitur(mol)
+            # mol_graph.fr_alkyl_halide = dsc.fr_alkyl_halide(mol)
+            # ####################################################
+
             samples.append((mol_graph, target[i]))
             mol_graphs.append(mol_graph)
 
@@ -177,6 +206,35 @@ def read_dataset(file_name):
     normalize_self_feat(mol_graphs, 'VSA_EState7')
     normalize_self_feat(mol_graphs, 'fr_C_O_noCOO')
     ####################################################
+
+    # ####################################################
+    # # esol
+    # # 3
+    # normalize_self_feat(mol_graphs, 'MolLogP')
+    # normalize_self_feat(mol_graphs, 'SMR_VSA10')
+    # normalize_self_feat(mol_graphs, 'MaxEStateIndex')
+    # # 5
+    # normalize_self_feat(mol_graphs, 'MaxAbsPartialCharge')
+    # normalize_self_feat(mol_graphs, 'BCUT2D_CHGHI')
+    # # 7
+    # normalize_self_feat(mol_graphs, 'BCUT2D_MWLOW')
+    # normalize_self_feat(mol_graphs, 'fr_imide')
+    # # 10
+    # normalize_self_feat(mol_graphs, 'Kappa2')
+    # normalize_self_feat(mol_graphs, 'MinAbsPartialCharge')
+    # normalize_self_feat(mol_graphs, 'NumAromaticHeterocycles')
+    # # 20
+    # normalize_self_feat(mol_graphs, 'SlogP_VSA1')
+    # normalize_self_feat(mol_graphs, 'fr_amide')
+    # normalize_self_feat(mol_graphs, 'BalabanJ')
+    # normalize_self_feat(mol_graphs, 'fr_Ar_NH')
+    # normalize_self_feat(mol_graphs, 'PEOE_VSA8')
+    # normalize_self_feat(mol_graphs, 'NumSaturatedRings')
+    # normalize_self_feat(mol_graphs, 'fr_NH0')
+    # normalize_self_feat(mol_graphs, 'PEOE_VSA13')
+    # normalize_self_feat(mol_graphs, 'fr_barbitur')
+    # normalize_self_feat(mol_graphs, 'fr_alkyl_halide')
+    # ####################################################
 
     return samples
 
