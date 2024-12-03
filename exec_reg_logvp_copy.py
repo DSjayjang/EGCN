@@ -3,7 +3,7 @@ import torch.nn as nn
 import dgl
 import random
 import numpy as np
-import util.mol_conv_logvp as mc
+import util.mol_conv_logvp_copy as mc
 from model import GCN
 
 from model import EGCN
@@ -34,6 +34,7 @@ SEED = 100
 
 os.environ['PYTHONHASHSEED'] = str(SEED)
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 random.seed(SEED)
 np.random.seed(SEED)
@@ -229,11 +230,11 @@ model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 
 # Extended_EGCN
-# model_Extended_EGCN_3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-# model_Extended_EGCN_5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-# model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-# model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-# model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_Extended_EGCN_3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
+model_Extended_EGCN_5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
+model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
+model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # model_Extended_EGCN_rd3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
 # model_Extended_EGCN_rd5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
@@ -263,25 +264,25 @@ print('--------- EGCN_3 ---------')
 test_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
 print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
 
-# # feature 5개
-# print('--------- EGCN_5 ---------')
-# test_losses['EGCN_5'] = trainer.cross_validation(dataset, model_EGCN_5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_5)
-# print('test loss (EGCN_5): ' + str(test_losses['EGCN_5']))
+# feature 5개
+print('--------- EGCN_5 ---------')
+test_losses['EGCN_5'] = trainer.cross_validation(dataset, model_EGCN_5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_5)
+print('test loss (EGCN_5): ' + str(test_losses['EGCN_5']))
 
-# # feature 7개
-# print('--------- EGCN_7 ---------')
-# test_losses['EGCN_7'] = trainer.cross_validation(dataset, model_EGCN_7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_7)
-# print('test loss (EGCN_7): ' + str(test_losses['EGCN_7']))
+# feature 7개
+print('--------- EGCN_7 ---------')
+test_losses['EGCN_7'] = trainer.cross_validation(dataset, model_EGCN_7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_7)
+print('test loss (EGCN_7): ' + str(test_losses['EGCN_7']))
 
-# # feature 10개
-# print('--------- EGCN_10 ---------')
-# test_losses['EGCN_10'] = trainer.cross_validation(dataset, model_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_10)
-# print('test loss (EGCN_10): ' + str(test_losses['EGCN_10']))
+# feature 10개
+print('--------- EGCN_10 ---------')
+test_losses['EGCN_10'] = trainer.cross_validation(dataset, model_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_10)
+print('test loss (EGCN_10): ' + str(test_losses['EGCN_10']))
 
-# # feature 20개
-# print('--------- EGCN_20 ---------')
-# test_losses['EGCN_20'] = trainer.cross_validation(dataset, model_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
-# print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
+# feature 20개
+print('--------- EGCN_20 ---------')
+test_losses['EGCN_20'] = trainer.cross_validation(dataset, model_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
 
 
 # # feature 3개
@@ -316,30 +317,30 @@ print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
 # print('test loss (EGCN_sf): ' + str(test_losses['EGCN_sf']))
 
 
-# # feature 3개
-# print('--------- Exteded EGCN_3 ---------')
-# test_losses['Extended_EGCN_3'] = trainer.cross_validation(dataset, model_Extended_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
-# print('test loss (Extended_EGCN_3): ' + str(test_losses['Extended_EGCN_3']))
+# feature 3개
+print('--------- Exteded EGCN_3 ---------')
+test_losses['Extended_EGCN_3'] = trainer.cross_validation(dataset, model_Extended_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
+print('test loss (Extended_EGCN_3): ' + str(test_losses['Extended_EGCN_3']))
 
-# # feature 5개
-# print('--------- Exteded EGCN_5 ---------')
-# test_losses['Extended_EGCN_5'] = trainer.cross_validation(dataset, model_Extended_EGCN_5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_5)
-# print('test loss (Extended_EGCN_5): ' + str(test_losses['Extended_EGCN_5']))
+# feature 5개
+print('--------- Exteded EGCN_5 ---------')
+test_losses['Extended_EGCN_5'] = trainer.cross_validation(dataset, model_Extended_EGCN_5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_5)
+print('test loss (Extended_EGCN_5): ' + str(test_losses['Extended_EGCN_5']))
 
-# # feature 7개
-# print('--------- Exteded EGCN_7 ---------')
-# test_losses['Extended_EGCN_7'] = trainer.cross_validation(dataset, model_Extended_EGCN_7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_7)
-# print('test loss (Extended_EGCN_7): ' + str(test_losses['Extended_EGCN_7']))
+# feature 7개
+print('--------- Exteded EGCN_7 ---------')
+test_losses['Extended_EGCN_7'] = trainer.cross_validation(dataset, model_Extended_EGCN_7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_7)
+print('test loss (Extended_EGCN_7): ' + str(test_losses['Extended_EGCN_7']))
 
-# # feature 10개
-# print('--------- Exteded EGCN_10 ---------')
-# test_losses['Extended_EGCN_10'] = trainer.cross_validation(dataset, model_Extended_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_10)
-# print('test loss (Extended_EGCN_10): ' + str(test_losses['Extended_EGCN_10']))
+# feature 10개
+print('--------- Exteded EGCN_10 ---------')
+test_losses['Extended_EGCN_10'] = trainer.cross_validation(dataset, model_Extended_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_10)
+print('test loss (Extended_EGCN_10): ' + str(test_losses['Extended_EGCN_10']))
 
-# # feature 20개
-# print('--------- Exteded EGCN_20 ---------')
-# test_losses['Extended_EGCN_20'] = trainer.cross_validation(dataset, model_Extended_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
-# print('test loss (Extended_EGCN_20): ' + str(test_losses['Extended_EGCN_20']))
+# feature 20개
+print('--------- Exteded EGCN_20 ---------')
+test_losses['Extended_EGCN_20'] = trainer.cross_validation(dataset, model_Extended_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+print('test loss (Extended_EGCN_20): ' + str(test_losses['Extended_EGCN_20']))
 
 
 # print('--------- Exteded EGCN_rd3 ---------')
