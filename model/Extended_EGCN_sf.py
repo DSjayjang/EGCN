@@ -45,11 +45,11 @@ class Net(nn.Module):
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
 
-        self.fc1 = nn.Linear(20 * dim_self_feat, 256)
-        self.fc2 = nn.Linear(256, 32)
+        self.fc1 = nn.Linear(20 * dim_self_feat, 128)
+        self.fc2 = nn.Linear(128, 32)
         self.fc3 = nn.Linear(32, dim_out)
 
-        self.bn1 = nn.BatchNorm1d(256)
+        self.bn1 = nn.BatchNorm1d(128)
         self.bn2 = nn.BatchNorm1d(32)
         self.dropout = nn.Dropout(0.3)
 

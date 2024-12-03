@@ -103,7 +103,6 @@ def normalize_self_feat(mol_graphs, self_feat_name):
         else:
             setattr(mol_graph, self_feat_name, (getattr(mol_graph, self_feat_name) - mean_self_feat) / std_self_feat)
 
-
 def read_dataset(file_name):
     samples = []
     mol_graphs = []
@@ -240,3 +239,4 @@ def read_dataset(file_name):
 
 
 atomic_props = read_atom_prop()
+
