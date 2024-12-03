@@ -18,7 +18,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 11
+dim_self_feat = 38
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -120,49 +120,112 @@ def read_dataset(file_name):
             ####################################################
             # logVP2
             # 3
-            mol_graph.Chi1 = dsc.Chi1(mol)
-            mol_graph.TPSA = dsc.TPSA(mol)
-            mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
-            # 5
-            mol_graph.NumHDonors = dsc.NumHDonors(mol)
-            mol_graph.EState_VSA1 = dsc.EState_VSA1(mol)
-            # 7
-            mol_graph.fr_ether = dsc.fr_ether(mol)
             mol_graph.MinAbsEStateIndex = dsc.MinAbsEStateIndex(mol)
+            mol_graph.qed = dsc.qed(mol)
+            mol_graph.FpDensityMorgan1 = dsc.FpDensityMorgan1(mol)
+            # 5
+            mol_graph.Chi1 = dsc.Chi1(mol)
+            mol_graph.Ipc = dsc.Ipc(mol)
+            # 7
+            mol_graph.PEOE_VSA10 = dsc.PEOE_VSA10(mol)
+            mol_graph.PEOE_VSA11 = dsc.PEOE_VSA11(mol)
             # 10
-            mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
-            mol_graph.EState_VSA5 = dsc.EState_VSA5(mol)
-            mol_graph.NumAliphaticHeterocycles = dsc.NumAliphaticHeterocycles(mol)
+            mol_graph.PEOE_VSA13 = dsc.PEOE_VSA13(mol)
+            mol_graph.PEOE_VSA9 = dsc.PEOE_VSA9(mol)
+            mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
             # 20
-            mol_graph.NumHAcceptors = dsc.NumHAcceptors(mol)
+            mol_graph.SMR_VSA4 = dsc.SMR_VSA4(mol)
+            mol_graph.SMR_VSA5 = dsc.SMR_VSA5(mol)
+            mol_graph.SlogP_VSA1 = dsc.SlogP_VSA1(mol)
+            mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
+            mol_graph.SlogP_VSA4 = dsc.SlogP_VSA4(mol)
 
+            mol_graph.SlogP_VSA8 = dsc.SlogP_VSA8(mol)
+            mol_graph.TPSA = dsc.TPSA(mol)
+            mol_graph.EState_VSA1 = dsc.EState_VSA1(mol)
+            mol_graph.EState_VSA5 = dsc.EState_VSA5(mol)
+            mol_graph.EState_VSA9 = dsc.EState_VSA9(mol)
+
+            mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
+            mol_graph.VSA_EState9 = dsc.VSA_EState9(mol)
+            mol_graph.NumAliphaticHeterocycles = dsc.NumAliphaticHeterocycles(mol)
+            mol_graph.NumHAcceptors = dsc.NumHAcceptors(mol)
+            mol_graph.NumHDonors = dsc.NumHDonors(mol)
+
+            mol_graph.NumSaturatedHeterocycles = dsc.NumSaturatedHeterocycles(mol)
+            mol_graph.fr_COO = dsc.fr_COO(mol)
+            mol_graph.fr_Nhpyrrole = dsc.fr_Nhpyrrole(mol)
+            mol_graph.fr_alkyl_carbamate = dsc.fr_alkyl_carbamate(mol)
+            mol_graph.fr_Al_OH_noTert = dsc.fr_Al_OH_noTert(mol)
+
+            mol_graph.fr_amide = dsc.fr_amide(mol)
+            mol_graph.fr_amidine = dsc.fr_amidine(mol)
+            mol_graph.fr_azo = dsc.fr_azo(mol)
+            mol_graph.fr_ether = dsc.fr_ether(mol)
+            mol_graph.fr_ketone = dsc.fr_ketone(mol)
+
+            mol_graph.fr_ketone_Topliss = dsc.fr_ketone_Topliss(mol)
+            mol_graph.fr_lactone = dsc.fr_lactone(mol)
+            mol_graph.fr_priamide = dsc.fr_priamide(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
             mol_graphs.append(mol_graph)
 
-
     ####################################################
     # logVP2
     # 3
-    normalize_self_feat(mol_graphs, 'Chi1')
-    normalize_self_feat(mol_graphs, 'TPSA')
-    normalize_self_feat(mol_graphs, 'SMR_VSA10')
-    # 5
-    normalize_self_feat(mol_graphs, 'NumHDonors')
-    normalize_self_feat(mol_graphs, 'EState_VSA1')
-    # 7
-    normalize_self_feat(mol_graphs, 'fr_ether')
     normalize_self_feat(mol_graphs, 'MinAbsEStateIndex')
+    normalize_self_feat(mol_graphs, 'qed')
+    normalize_self_feat(mol_graphs, 'FpDensityMorgan1')
+    # 5
+    normalize_self_feat(mol_graphs, 'Chi1')
+    normalize_self_feat(mol_graphs, 'Ipc')
+    # 7
+    normalize_self_feat(mol_graphs, 'PEOE_VSA10')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA11')
     # 10
-    normalize_self_feat(mol_graphs, 'SlogP_VSA10')
-    normalize_self_feat(mol_graphs, 'EState_VSA5')
-    normalize_self_feat(mol_graphs, 'NumAliphaticHeterocycles')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA13')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA9')
+    normalize_self_feat(mol_graphs, 'SMR_VSA10')
     # 20
+    normalize_self_feat(mol_graphs, 'SMR_VSA4')
+    normalize_self_feat(mol_graphs, 'SMR_VSA5')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA1')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA10')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA4')
+
+    normalize_self_feat(mol_graphs, 'SlogP_VSA8')
+    normalize_self_feat(mol_graphs, 'TPSA')
+    normalize_self_feat(mol_graphs, 'EState_VSA1')
+    normalize_self_feat(mol_graphs, 'EState_VSA5')
+    normalize_self_feat(mol_graphs, 'EState_VSA9')
+    
+    normalize_self_feat(mol_graphs, 'VSA_EState8')
+    normalize_self_feat(mol_graphs, 'VSA_EState9')
+    normalize_self_feat(mol_graphs, 'NumAliphaticHeterocycles')
     normalize_self_feat(mol_graphs, 'NumHAcceptors')
+    normalize_self_feat(mol_graphs, 'NumHDonors')
+    
+    normalize_self_feat(mol_graphs, 'NumSaturatedHeterocycles')
+    normalize_self_feat(mol_graphs, 'fr_COO')
+    normalize_self_feat(mol_graphs, 'fr_Nhpyrrole')
+    normalize_self_feat(mol_graphs, 'fr_alkyl_carbamate')
+    normalize_self_feat(mol_graphs, 'fr_Al_OH_noTert')
+    
+    normalize_self_feat(mol_graphs, 'fr_amide')
+    normalize_self_feat(mol_graphs, 'fr_amidine')
+    normalize_self_feat(mol_graphs, 'fr_azo')
+    normalize_self_feat(mol_graphs, 'fr_ether')
+    normalize_self_feat(mol_graphs, 'fr_ketone')
+
+    normalize_self_feat(mol_graphs, 'fr_ketone_Topliss')
+    normalize_self_feat(mol_graphs, 'fr_lactone')
+    normalize_self_feat(mol_graphs, 'fr_priamide')
     ####################################################
 
     return samples
 
 
 atomic_props = read_atom_prop()
+

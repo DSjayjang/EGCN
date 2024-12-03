@@ -4,6 +4,7 @@ import dgl
 import random
 import numpy as np
 import util.mol_conv_logvp as mc
+import util.mol_conv_logvp_rd as mc_rd
 import util.mol_conv_logvp_sf as mc_sf
 from model import GCN
 
@@ -35,6 +36,7 @@ SEED = 100
 
 os.environ['PYTHONHASHSEED'] = str(SEED)
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['KMP_DUPLICATE_LIB_OK']='True' # 라이브러리 충돌 시
 
 random.seed(SEED)
 np.random.seed(SEED)
@@ -49,8 +51,8 @@ print(device)
 # experiment parameters
 dataset_name = 'logVP2'
 batch_size = 32
-max_epochs = 1
-k = 2
+max_epochs = 300
+k = 5
 
 
 def collate(samples):
@@ -63,154 +65,7 @@ def collate(samples):
 """
 logVP2 용
 """
-# ########################################################################################################
-# # logVP2
-# # don't touch
-# def collate_emodel_Extended_3(samples):
-#     self_feats = np.empty((len(samples), 3), dtype=np.float32)
-
-#     for i in range(0, len(samples)):
-#         mol_graph = samples[i][0]
-
-#         ####################################################
-#         # logVP2
-#         # 3
-#         self_feats[i, 0] = mol_graph.Chi1
-#         self_feats[i, 1] = mol_graph.TPSA
-#         self_feats[i, 2] = mol_graph.SMR_VSA10
-#         ####################################################
-
-#     graphs, labels = map(list, zip(*samples))
-#     batched_graph = dgl.batch(graphs)
-
-#     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
-
-
-# def collate_emodel_Extended_5(samples):
-#     self_feats = np.empty((len(samples), 5), dtype=np.float32)
-
-#     for i in range(0, len(samples)):
-#         mol_graph = samples[i][0]
-
-#         ####################################################
-#         # logVP2
-#         # 3
-#         self_feats[i, 0] = mol_graph.Chi1
-#         self_feats[i, 1] = mol_graph.TPSA
-#         self_feats[i, 2] = mol_graph.SMR_VSA10
-#         # 5
-#         self_feats[i, 3] = mol_graph.VSA_EState8
-#         self_feats[i, 4] = mol_graph.fr_ether
-#         ####################################################
-#     graphs, labels = map(list, zip(*samples))
-#     batched_graph = dgl.batch(graphs)
-
-#     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
-        
-
-# def collate_emodel_Extended_7(samples):
-#     self_feats = np.empty((len(samples), 7), dtype=np.float32)
-
-#     for i in range(0, len(samples)):
-#         mol_graph = samples[i][0]
-
-#         ####################################################
-#         # logVP2
-#         # 3
-#         self_feats[i, 0] = mol_graph.Chi1
-#         self_feats[i, 1] = mol_graph.TPSA
-#         self_feats[i, 2] = mol_graph.SMR_VSA10
-#         # 5
-#         self_feats[i, 3] = mol_graph.VSA_EState8
-#         self_feats[i, 4] = mol_graph.fr_ether
-#         # 7
-#         self_feats[i, 5] = mol_graph.EState_VSA1
-#         self_feats[i, 6] = mol_graph.NumAliphaticHeterocycles
-#         ####################################################
-
-#     graphs, labels = map(list, zip(*samples))
-#     batched_graph = dgl.batch(graphs)
-
-#     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
-
-
-# def collate_emodel_Extended_10(samples):
-#     self_feats = np.empty((len(samples), 10), dtype=np.float32)
-
-#     for i in range(0, len(samples)):
-#         mol_graph = samples[i][0]
-
-#         ####################################################
-#         # logVP2
-#         # 3
-#         self_feats[i, 0] = mol_graph.Chi1
-#         self_feats[i, 1] = mol_graph.TPSA
-#         self_feats[i, 2] = mol_graph.SMR_VSA10
-#         # 5
-#         self_feats[i, 3] = mol_graph.VSA_EState8
-#         self_feats[i, 4] = mol_graph.fr_ether
-#         # 7
-#         self_feats[i, 5] = mol_graph.EState_VSA1
-#         self_feats[i, 6] = mol_graph.NumAliphaticHeterocycles
-#         # 10
-#         self_feats[i, 7] = mol_graph.EState_VSA5
-#         self_feats[i, 8] = mol_graph.SlogP_VSA10
-#         self_feats[i, 9] = mol_graph.MinAbsEStateIndex
-#         ####################################################
-
-#     graphs, labels = map(list, zip(*samples))
-#     batched_graph = dgl.batch(graphs)
-
-#     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
-
-
-# def collate_emodel_Extended_20(samples):
-#     self_feats = np.empty((len(samples), 20), dtype=np.float32)
-
-#     for i in range(0, len(samples)):
-#         mol_graph = samples[i][0]
-
-#         ####################################################
-#         # logVP2
-#         # 3
-#         self_feats[i, 0] = mol_graph.Chi1
-#         self_feats[i, 1] = mol_graph.TPSA
-#         self_feats[i, 2] = mol_graph.SMR_VSA10
-#         # 5
-#         self_feats[i, 3] = mol_graph.VSA_EState8
-#         self_feats[i, 4] = mol_graph.fr_ether
-#         # 7
-#         self_feats[i, 5] = mol_graph.EState_VSA1
-#         self_feats[i, 6] = mol_graph.NumAliphaticHeterocycles
-#         # 10
-#         self_feats[i, 7] = mol_graph.EState_VSA5
-#         self_feats[i, 8] = mol_graph.SlogP_VSA10
-#         self_feats[i, 9] = mol_graph.MinAbsEStateIndex
-#         # 20
-#         self_feats[i, 10] = mol_graph.NumHAcceptors
-#         self_feats[i, 11] = mol_graph.fr_COO
-#         self_feats[i, 12] = mol_graph.SlogP_VSA8
-#         self_feats[i, 13] = mol_graph.SlogP_VSA1
-#         self_feats[i, 14] = mol_graph.VSA_EState9
-#         self_feats[i, 15] = mol_graph.fr_azo
-#         self_feats[i, 16] = mol_graph.EState_VSA9
-#         self_feats[i, 17] = mol_graph.RingCount
-#         self_feats[i, 18] = mol_graph.PEOE_VSA11
-#         self_feats[i, 19] = mol_graph.VSA_EState8
-
-#         ####################################################
-
-#     graphs, labels = map(list, zip(*samples))
-#     batched_graph = dgl.batch(graphs)
-
-#     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
-# ########################################################################################################
-
-"""
-logVP2 랜덤 feature 용
-"""
 ########################################################################################################
-# logVP2
 # don't touch
 def collate_emodel_Extended_3(samples):
     self_feats = np.empty((len(samples), 3), dtype=np.float32)
@@ -219,11 +74,10 @@ def collate_emodel_Extended_3(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
         # 3
-        self_feats[i, 0] = mol_graph.PEOE_VSA13
-        self_feats[i, 1] = mol_graph.fr_Ar_NH
-        self_feats[i, 2] = mol_graph.fr_Ar_N
+        self_feats[i, 0] = mol_graph.Chi1
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.SMR_VSA10
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -239,14 +93,13 @@ def collate_emodel_Extended_5(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
         # 3
-        self_feats[i, 0] = mol_graph.PEOE_VSA13
-        self_feats[i, 1] = mol_graph.fr_Ar_NH
-        self_feats[i, 2] = mol_graph.fr_Ar_N
+        self_feats[i, 0] = mol_graph.Chi1
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.SMR_VSA10
         # 5
-        self_feats[i, 3] = mol_graph.PEOE_VSA7
-        self_feats[i, 4] = mol_graph.fr_piperdine
+        self_feats[i, 3] = mol_graph.VSA_EState8
+        self_feats[i, 4] = mol_graph.fr_ether
         ####################################################
     graphs, labels = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
@@ -261,7 +114,146 @@ def collate_emodel_Extended_7(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
+        # 3
+        self_feats[i, 0] = mol_graph.Chi1
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.SMR_VSA10
+        # 5
+        self_feats[i, 3] = mol_graph.VSA_EState8
+        self_feats[i, 4] = mol_graph.fr_ether
+        # 7
+        self_feats[i, 5] = mol_graph.EState_VSA1
+        self_feats[i, 6] = mol_graph.NumAliphaticHeterocycles
+        ####################################################
+
+    graphs, labels = map(list, zip(*samples))
+    batched_graph = dgl.batch(graphs)
+
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+
+
+def collate_emodel_Extended_10(samples):
+    self_feats = np.empty((len(samples), 10), dtype=np.float32)
+
+    for i in range(0, len(samples)):
+        mol_graph = samples[i][0]
+
+        ####################################################
+        # 3
+        self_feats[i, 0] = mol_graph.Chi1
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.SMR_VSA10
+        # 5
+        self_feats[i, 3] = mol_graph.VSA_EState8
+        self_feats[i, 4] = mol_graph.fr_ether
+        # 7
+        self_feats[i, 5] = mol_graph.EState_VSA1
+        self_feats[i, 6] = mol_graph.NumAliphaticHeterocycles
+        # 10
+        self_feats[i, 7] = mol_graph.EState_VSA5
+        self_feats[i, 8] = mol_graph.SlogP_VSA10
+        self_feats[i, 9] = mol_graph.MinAbsEStateIndex
+        ####################################################
+
+    graphs, labels = map(list, zip(*samples))
+    batched_graph = dgl.batch(graphs)
+
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+
+
+def collate_emodel_Extended_20(samples):
+    self_feats = np.empty((len(samples), 20), dtype=np.float32)
+
+    for i in range(0, len(samples)):
+        mol_graph = samples[i][0]
+
+        ####################################################
+        # 3
+        self_feats[i, 0] = mol_graph.Chi1
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.SMR_VSA10
+        # 5
+        self_feats[i, 3] = mol_graph.VSA_EState8
+        self_feats[i, 4] = mol_graph.fr_ether
+        # 7
+        self_feats[i, 5] = mol_graph.EState_VSA1
+        self_feats[i, 6] = mol_graph.NumAliphaticHeterocycles
+        # 10
+        self_feats[i, 7] = mol_graph.EState_VSA5
+        self_feats[i, 8] = mol_graph.SlogP_VSA10
+        self_feats[i, 9] = mol_graph.MinAbsEStateIndex
+        # 20
+        self_feats[i, 10] = mol_graph.NumHAcceptors
+        self_feats[i, 11] = mol_graph.fr_COO
+        self_feats[i, 12] = mol_graph.SlogP_VSA8
+        self_feats[i, 13] = mol_graph.SlogP_VSA1
+        self_feats[i, 14] = mol_graph.VSA_EState9
+        self_feats[i, 15] = mol_graph.fr_azo
+        self_feats[i, 16] = mol_graph.EState_VSA9
+        self_feats[i, 17] = mol_graph.RingCount
+        self_feats[i, 18] = mol_graph.PEOE_VSA11
+        self_feats[i, 19] = mol_graph.VSA_EState8
+
+        ####################################################
+
+    graphs, labels = map(list, zip(*samples))
+    batched_graph = dgl.batch(graphs)
+
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+########################################################################################################
+
+"""
+logVP2 랜덤 feature 용
+"""
+########################################################################################################
+# don't touch
+def collate_emodel_Extended_rd3(samples):
+    self_feats = np.empty((len(samples), 3), dtype=np.float32)
+
+    for i in range(0, len(samples)):
+        mol_graph = samples[i][0]
+
+        ####################################################
+        # 3
+        self_feats[i, 0] = mol_graph.PEOE_VSA13
+        self_feats[i, 1] = mol_graph.fr_Ar_NH
+        self_feats[i, 2] = mol_graph.fr_Ar_N
+        ####################################################
+
+    graphs, labels = map(list, zip(*samples))
+    batched_graph = dgl.batch(graphs)
+
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+
+
+def collate_emodel_Extended_rd5(samples):
+    self_feats = np.empty((len(samples), 5), dtype=np.float32)
+
+    for i in range(0, len(samples)):
+        mol_graph = samples[i][0]
+
+        ####################################################
+        # 3
+        self_feats[i, 0] = mol_graph.PEOE_VSA13
+        self_feats[i, 1] = mol_graph.fr_Ar_NH
+        self_feats[i, 2] = mol_graph.fr_Ar_N
+        # 5
+        self_feats[i, 3] = mol_graph.PEOE_VSA7
+        self_feats[i, 4] = mol_graph.fr_piperdine
+        ####################################################
+    graphs, labels = map(list, zip(*samples))
+    batched_graph = dgl.batch(graphs)
+
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+        
+
+def collate_emodel_Extended_rd7(samples):
+    self_feats = np.empty((len(samples), 7), dtype=np.float32)
+
+    for i in range(0, len(samples)):
+        mol_graph = samples[i][0]
+
+        ####################################################
         # 3
         self_feats[i, 0] = mol_graph.PEOE_VSA13
         self_feats[i, 1] = mol_graph.fr_Ar_NH
@@ -280,14 +272,13 @@ def collate_emodel_Extended_7(samples):
     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
 
 
-def collate_emodel_Extended_10(samples):
+def collate_emodel_Extended_rd10(samples):
     self_feats = np.empty((len(samples), 10), dtype=np.float32)
 
     for i in range(0, len(samples)):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
         # 3
         self_feats[i, 0] = mol_graph.PEOE_VSA13
         self_feats[i, 1] = mol_graph.fr_Ar_NH
@@ -310,14 +301,13 @@ def collate_emodel_Extended_10(samples):
     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
 
 
-def collate_emodel_Extended_20(samples):
+def collate_emodel_Extended_rd20(samples):
     self_feats = np.empty((len(samples), 20), dtype=np.float32)
 
     for i in range(0, len(samples)):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
         # 3
         self_feats[i, 0] = mol_graph.PEOE_VSA13
         self_feats[i, 1] = mol_graph.fr_Ar_NH
@@ -360,23 +350,54 @@ def collate_emodel_Extended_sf(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # logVP2
         # 3
-        self_feats[i, 0] = mol_graph.Chi1
-        self_feats[i, 1] = mol_graph.TPSA
-        self_feats[i, 2] = mol_graph.SMR_VSA10
+        self_feats[i, 0] = mol_graph.MinAbsEStateIndex
+        self_feats[i, 1] = mol_graph.qed
+        self_feats[i, 2] = mol_graph.FpDensityMorgan1
         # 5
-        self_feats[i, 3] = mol_graph.NumHDonors
-        self_feats[i, 4] = mol_graph.EState_VSA1
+        self_feats[i, 3] = mol_graph.Chi1
+        self_feats[i, 4] = mol_graph.Ipc
         # 7
-        self_feats[i, 5] = mol_graph.fr_ether
-        self_feats[i, 6] = mol_graph.MinAbsEStateIndex
+        self_feats[i, 5] = mol_graph.PEOE_VSA10
+        self_feats[i, 6] = mol_graph.PEOE_VSA11
         # 10
-        self_feats[i, 7] = mol_graph.SlogP_VSA10
-        self_feats[i, 8] = mol_graph.EState_VSA5
-        self_feats[i, 9] = mol_graph.NumAliphaticHeterocycles
+        self_feats[i, 7] = mol_graph.PEOE_VSA13
+        self_feats[i, 8] = mol_graph.PEOE_VSA9
+        self_feats[i, 9] = mol_graph.SMR_VSA10
         # 20
-        self_feats[i, 10] = mol_graph.NumHAcceptors
+        self_feats[i, 10] = mol_graph.SMR_VSA4
+        self_feats[i, 11] = mol_graph.SMR_VSA5
+        self_feats[i, 12] = mol_graph.SlogP_VSA1
+        self_feats[i, 13] = mol_graph.SlogP_VSA10
+        self_feats[i, 14] = mol_graph.SlogP_VSA4
+
+        self_feats[i, 15] = mol_graph.SlogP_VSA8
+        self_feats[i, 16] = mol_graph.TPSA
+        self_feats[i, 17] = mol_graph.EState_VSA1
+        self_feats[i, 18] = mol_graph.EState_VSA5
+        self_feats[i, 19] = mol_graph.EState_VSA9
+
+        self_feats[i, 20] = mol_graph.VSA_EState8
+        self_feats[i, 21] = mol_graph.VSA_EState9
+        self_feats[i, 22] = mol_graph.NumAliphaticHeterocycles
+        self_feats[i, 23] = mol_graph.NumHAcceptors
+        self_feats[i, 24] = mol_graph.NumHDonors
+
+        self_feats[i, 25] = mol_graph.NumSaturatedHeterocycles
+        self_feats[i, 26] = mol_graph.fr_COO
+        self_feats[i, 27] = mol_graph.fr_Nhpyrrole
+        self_feats[i, 28] = mol_graph.fr_alkyl_carbamate
+        self_feats[i, 29] = mol_graph.fr_Al_OH_noTert
+
+        self_feats[i, 30] = mol_graph.fr_amide
+        self_feats[i, 31] = mol_graph.fr_amidine
+        self_feats[i, 32] = mol_graph.fr_azo
+        self_feats[i, 33] = mol_graph.fr_ether
+        self_feats[i, 34] = mol_graph.fr_Al_OH_noTert
+        
+        self_feats[i, 35] = mol_graph.fr_ketone_Topliss
+        self_feats[i, 36] = mol_graph.fr_lactone
+        self_feats[i, 37] = mol_graph.fr_priamide    
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -389,8 +410,10 @@ def collate_emodel_Extended_sf(samples):
 # load train, validation, and test datasets
 print('Data loading...')
 dataset = mc.read_dataset('data/' + dataset_name + '.csv')
+dataset_rd = mc_rd.read_dataset('data/' + dataset_name + '.csv')
 dataset_sf = mc_sf.read_dataset('data/' + dataset_name + '.csv')
 random.shuffle(dataset)
+random.shuffle(dataset_rd)
 random.shuffle(dataset_sf)
 
 
@@ -401,26 +424,26 @@ model_EGCN_7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
 model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
-# model_EGCN_rd3 = EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-# model_EGCN_rd5 = EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-# model_EGCN_rd7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-# model_EGCN_rd10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-# model_EGCN_rd20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_EGCN_rd3 = EGCN_3.Net(mc_rd.dim_atomic_feat, 1, 3).to(device)
+model_EGCN_rd5 = EGCN_5.Net(mc_rd.dim_atomic_feat, 1, 5).to(device)
+model_EGCN_rd7 = EGCN_7.Net(mc_rd.dim_atomic_feat, 1, 7).to(device)
+model_EGCN_rd10 = EGCN_10.Net(mc_rd.dim_atomic_feat, 1, 10).to(device)
+model_EGCN_rd20 = EGCN_20.Net(mc_rd.dim_atomic_feat, 1, 20).to(device)
 
 model_EGCN_sf = EGCN_sf.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
 
 # Extended_EGCN
-# model_Extended_EGCN_3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-# model_Extended_EGCN_5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-# model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-# model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-# model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_Extended_EGCN_3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
+model_Extended_EGCN_5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
+model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
+model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
-model_Extended_EGCN_rd3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_Extended_EGCN_rd5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_Extended_EGCN_rd7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-model_Extended_EGCN_rd10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-model_Extended_EGCN_rd20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_Extended_EGCN_rd3 = Extended_EGCN_3.Net(mc_rd.dim_atomic_feat, 1, 3).to(device)
+model_Extended_EGCN_rd5 = Extended_EGCN_5.Net(mc_rd.dim_atomic_feat, 1, 5).to(device)
+model_Extended_EGCN_rd7 = Extended_EGCN_7.Net(mc_rd.dim_atomic_feat, 1, 7).to(device)
+model_Extended_EGCN_rd10 = Extended_EGCN_10.Net(mc_rd.dim_atomic_feat, 1, 10).to(device)
+model_Extended_EGCN_rd20 = Extended_EGCN_20.Net(mc_rd.dim_atomic_feat, 1, 20).to(device)
 
 model_Extended_EGCN_sf = Extended_EGCN_sf.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
 
@@ -440,10 +463,10 @@ test_losses = dict()
 
 # self feature
 
-# feature 3개
-print('--------- EGCN_3 ---------')
-test_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
-print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
+# # feature 3개
+# print('--------- EGCN_3 ---------')
+# test_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
+# print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
 
 # # feature 5개
 # print('--------- EGCN_5 ---------')
@@ -468,7 +491,7 @@ print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
 
 # # feature 3개
 # print('--------- EGCN_rd3 ---------')
-# test_losses['EGCN_rd3'] = trainer.cross_validation(dataset, model_EGCN_rd3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_3)
+# test_losses['EGCN_rd3'] = trainer.cross_validation(dataset_rd, model_EGCN_rd3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd3)
 # print('test loss (EGCN_rd3): ' + str(test_losses['EGCN_rd3']))
 
 # # feature 5개
@@ -525,34 +548,34 @@ print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
 
 
 # print('--------- Exteded EGCN_rd3 ---------')
-# test_losses['Extended_EGCN_rd3'] = trainer.cross_validation(dataset, model_Extended_EGCN_rd3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd3)
+# test_losses['Extended_EGCN_rd3'] = trainer.cross_validation(dataset_rd, model_Extended_EGCN_rd3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd3)
 # print('test loss (Extended_EGCN_rd3): ' + str(test_losses['Extended_EGCN_rd3']))
 
 # # feature 5개
 # print('--------- Exteded EGCN_rd5 ---------')
-# test_losses['Extended_EGCN_rd5'] = trainer.cross_validation(dataset, model_Extended_EGCN_rd5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd5)
+# test_losses['Extended_EGCN_rd5'] = trainer.cross_validation(dataset_rd, model_Extended_EGCN_rd5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd5)
 # print('test loss (Extended_EGCN_rd5): ' + str(test_losses['Extended_EGCN_rd5']))
 
 # # feature 7개
 # print('--------- Exteded EGCN_rd7 ---------')
-# test_losses['Extended_EGCN_rd7'] = trainer.cross_validation(dataset, model_Extended_EGCN_rd7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd7)
+# test_losses['Extended_EGCN_rd7'] = trainer.cross_validation(dataset_rd, model_Extended_EGCN_rd7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd7)
 # print('test loss (Extended_EGCN_rd7): ' + str(test_losses['Extended_EGCN_rd7']))
 
 # # feature 10개
 # print('--------- Exteded EGCN_rd10 ---------')
-# test_losses['Extended_EGCN_rd10'] = trainer.cross_validation(dataset, model_Extended_EGCN_rd10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd10)
+# test_losses['Extended_EGCN_rd10'] = trainer.cross_validation(dataset_rd, model_Extended_EGCN_rd10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd10)
 # print('test loss (Extended_EGCN_rd10): ' + str(test_losses['Extended_EGCN_rd10']))
 
 # # feature 20개
 # print('--------- Exteded EGCN_rd20 ---------')
-# test_losses['Extended_EGCN_rd20'] = trainer.cross_validation(dataset, model_Extended_EGCN_rd20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd20)
+# test_losses['Extended_EGCN_rd20'] = trainer.cross_validation(dataset_rd, model_Extended_EGCN_rd20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_rd20)
 # print('test loss (Extended_EGCN_rd20): ' + str(test_losses['Extended_EGCN_rd20']))
 
 
-# # self_feature
-# print('--------- Exteded EGCN_sf ---------')
-# test_losses['Extended_EGCN_sf'] = trainer.cross_validation(dataset_sf, model_Extended_EGCN_sf, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_sf)
-# print('test loss (Extended_EGCN_sf): ' + str(test_losses['Extended_EGCN_sf']))
+# self_feature
+print('--------- Exteded EGCN_sf ---------')
+test_losses['Extended_EGCN_sf'] = trainer.cross_validation(dataset_sf, model_Extended_EGCN_sf, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_sf)
+print('test loss (Extended_EGCN_sf): ' + str(test_losses['Extended_EGCN_sf']))
 
 
 #=====================================================================#

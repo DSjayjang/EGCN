@@ -72,7 +72,6 @@ def collate_emodel_Extended_3(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # esol
         # 3
         self_feats[i, 0] = mol_graph.MinPartialCharge
         self_feats[i, 1] = mol_graph.SlogP_VSA2
@@ -80,7 +79,6 @@ def collate_emodel_Extended_3(samples):
         ####################################################
 
         # ####################################################
-        # # esol
         # # 3
         # self_feats[i, 0] = mol_graph.MolLogP
         # self_feats[i, 1] = mol_graph.SMR_VSA10
@@ -100,7 +98,6 @@ def collate_emodel_Extended_5(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # esol
         # 3
         self_feats[i, 0] = mol_graph.MinPartialCharge
         self_feats[i, 1] = mol_graph.SlogP_VSA2
@@ -111,7 +108,6 @@ def collate_emodel_Extended_5(samples):
         ####################################################
 
         # ####################################################
-        # # esol
         # # 3
         # self_feats[i, 0] = mol_graph.MolLogP
         # self_feats[i, 1] = mol_graph.SMR_VSA10
@@ -134,7 +130,6 @@ def collate_emodel_Extended_7(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # esol
         # 3
         self_feats[i, 0] = mol_graph.MinPartialCharge
         self_feats[i, 1] = mol_graph.SlogP_VSA2
@@ -148,7 +143,6 @@ def collate_emodel_Extended_7(samples):
         ####################################################
 
         # ####################################################
-        # # esol
         # # 3
         # self_feats[i, 0] = mol_graph.MolLogP
         # self_feats[i, 1] = mol_graph.SMR_VSA10
@@ -174,7 +168,6 @@ def collate_emodel_Extended_10(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # esol
         # 3
         self_feats[i, 0] = mol_graph.MinPartialCharge
         self_feats[i, 1] = mol_graph.SlogP_VSA2
@@ -192,7 +185,6 @@ def collate_emodel_Extended_10(samples):
         ####################################################
 
         # ####################################################
-        # # esol
         # # 3
         # self_feats[i, 0] = mol_graph.MolLogP
         # self_feats[i, 1] = mol_graph.SMR_VSA10
@@ -222,7 +214,6 @@ def collate_emodel_Extended_20(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # esol
         # 3
         self_feats[i, 0] = mol_graph.MinPartialCharge
         self_feats[i, 1] = mol_graph.SlogP_VSA2
@@ -251,7 +242,6 @@ def collate_emodel_Extended_20(samples):
         ####################################################
 
         # ####################################################
-        # # esol
         # # 3
         # self_feats[i, 0] = mol_graph.MolLogP
         # self_feats[i, 1] = mol_graph.SMR_VSA10
@@ -293,7 +283,6 @@ def collate_emodel_Extended_sf(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # esol
         # 3
         self_feats[i, 0] = mol_graph.MaxEStateIndex
         self_feats[i, 1] = mol_graph.MaxAbsPartialCharge
