@@ -5,23 +5,7 @@ import random
 import numpy as np
 import util.mol_conv as mc
 from model import GCN
-
 from model import EGCN
-from model import EGCN_3
-from model import EGCN_5
-from model import EGCN_7
-from model import EGCN_10
-from model import EGCN_20
-
-from model import Extended_EGCN
-from model import Extended_EGCN_3
-from model import Extended_EGCN_5
-from model import Extended_EGCN_7
-from model import Extended_EGCN_10
-from model import Extended_EGCN_20
-
-from model import Bilinear_EGCN
-from model import test_EGCN
 from util import trainer
 
 # 재현성-난수 고정
@@ -36,7 +20,11 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
+dgl.random.seed(SEED)
 #tf.random.set_seed(SEED)
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 
 # check GPU availability

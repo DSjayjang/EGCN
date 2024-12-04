@@ -36,7 +36,11 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
+dgl.random.seed(SEED)
 #tf.random.set_seed(SEED)
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 
 # check GPU availability
