@@ -115,7 +115,6 @@ def read_dataset(file_name):
         mol, mol_graph = smiles_to_mol_graph(smiles[i])
 
         if mol is not None and mol_graph is not None:
-
             ####################################################
             # 3
             mol_graph.MolLogP = dsc.MolLogP(mol)
@@ -131,12 +130,13 @@ def read_dataset(file_name):
             mol_graph.Kappa2 = dsc.Kappa2(mol)
             mol_graph.MinAbsPartialCharge = dsc.MinAbsPartialCharge(mol)
             mol_graph.NumAromaticHeterocycles = dsc.NumAromaticHeterocycles(mol)
-            # 20
+            # 11
             mol_graph.SlogP_VSA1 = dsc.SlogP_VSA1(mol)
             mol_graph.fr_amide = dsc.fr_amide(mol)
             mol_graph.BalabanJ = dsc.BalabanJ(mol)
             mol_graph.fr_Ar_NH = dsc.fr_Ar_NH(mol)
             mol_graph.PEOE_VSA8 = dsc.PEOE_VSA8(mol)
+            # 16
             mol_graph.NumSaturatedRings = dsc.NumSaturatedRings(mol)
             mol_graph.fr_NH0 = dsc.fr_NH0(mol)
             mol_graph.PEOE_VSA13 = dsc.PEOE_VSA13(mol)
@@ -146,6 +146,7 @@ def read_dataset(file_name):
 
             samples.append((mol_graph, target[i]))
             mol_graphs.append(mol_graph)
+
 
     ####################################################
     # 3
@@ -162,21 +163,20 @@ def read_dataset(file_name):
     normalize_self_feat(mol_graphs, 'Kappa2')
     normalize_self_feat(mol_graphs, 'MinAbsPartialCharge')
     normalize_self_feat(mol_graphs, 'NumAromaticHeterocycles')
-    # 20
+    # 11
     normalize_self_feat(mol_graphs, 'SlogP_VSA1')
     normalize_self_feat(mol_graphs, 'fr_amide')
     normalize_self_feat(mol_graphs, 'BalabanJ')
     normalize_self_feat(mol_graphs, 'fr_Ar_NH')
     normalize_self_feat(mol_graphs, 'PEOE_VSA8')
+    # 16
     normalize_self_feat(mol_graphs, 'NumSaturatedRings')
     normalize_self_feat(mol_graphs, 'fr_NH0')
     normalize_self_feat(mol_graphs, 'PEOE_VSA13')
     normalize_self_feat(mol_graphs, 'fr_barbitur')
     normalize_self_feat(mol_graphs, 'fr_alkyl_halide')
-    ####################################################
 
     return samples
 
 
 atomic_props = read_atom_prop()
-
