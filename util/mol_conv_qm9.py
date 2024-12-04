@@ -118,33 +118,31 @@ def read_dataset(file_name):
         if mol is not None and mol_graph is not None:
 
             ####################################################
-            # qm9_reduced
             # 3
-            mol_graph.HeavyAtomCount = dsc.HeavyAtomCount(mol)
-            mol_graph.Chi0 = dsc.Chi0(mol)
-            mol_graph.Chi0v = dsc.Chi0v(mol)
-            # 5
-            mol_graph.TPSA = dsc.TPSA(mol)
-            mol_graph.fr_Al_OH = dsc.fr_Al_OH(mol)
-            # 7
-            mol_graph.NumHAcceptors = dsc.NumHAcceptors(mol)
-            mol_graph.Chi4v = dsc.Chi4v(mol)
-            # 10
-            mol_graph.NumRotatableBonds = dsc.NumRotatableBonds(mol)
-            mol_graph.BCUT2D_CHGHI = dsc.BCUT2D_CHGHI(mol)
-            mol_graph.SMR_VSA9 = dsc.SMR_VSA9(mol)
-            # 20
-            mol_graph.BertzCT = dsc.BertzCT(mol)
-            mol_graph.PEOE_VSA4 = dsc.PEOE_VSA4(mol)
+            mol_graph.Chi0n = dsc.Chi0n(mol)
             mol_graph.Kappa1 = dsc.Kappa1(mol)
-            mol_graph.NumSaturatedCarbocycles = dsc.NumSaturatedCarbocycles(mol)
-            mol_graph.MolLogP = dsc.MolLogP(mol)
+            mol_graph.NHOHCount = dsc.NHOHCount(mol)
+            # 5
+            mol_graph.Chi4n = dsc.Chi4n(mol)
+            mol_graph.BCUT2D_CHGHI = dsc.BCUT2D_CHGHI(mol)
+            # 7
+            mol_graph.NumAliphaticHeterocycles = dsc.NumAliphaticHeterocycles(mol)
+            mol_graph.SMR_VSA7 = dsc.SMR_VSA7(mol)
+            # 10
+            mol_graph.FractionCSP3 = dsc.FractionCSP3(mol)
+            mol_graph.BertzCT = dsc.BertzCT(mol)
+            mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
+            # 20
+            mol_graph.NumRotatableBonds = dsc.NumRotatableBonds(mol)
             mol_graph.BalabanJ = dsc.BalabanJ(mol)
-            mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
-            mol_graph.VSA_EState4 = dsc.VSA_EState4(mol)
-            mol_graph.VSA_EState7 = dsc.VSA_EState7(mol)
-            mol_graph.fr_Ar_OH = dsc.fr_Ar_OH(mol)
-
+            mol_graph.fr_Al_OH = dsc.fr_Al_OH(mol)
+            mol_graph.fr_term_acetylene = dsc.fr_term_acetylene(mol)
+            mol_graph.fr_Ar_N = dsc.fr_Ar_N(mol)
+            mol_graph.BCUT2D_MWLOW = dsc.BCUT2D_MWLOW(mol)
+            mol_graph.fr_NH1 = dsc.fr_NH1(mol)
+            mol_graph.FpDensityMorgan3 = dsc.FpDensityMorgan3(mol)
+            mol_graph.BCUT2D_LOGPLOW = dsc.BCUT2D_LOGPLOW(mol)
+            mol_graph.PEOE_VSA4 = dsc.PEOE_VSA4(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
@@ -152,32 +150,31 @@ def read_dataset(file_name):
 
 
     ####################################################
-    # qm9_reduced
     # 3
-    normalize_self_feat(mol_graphs, 'HeavyAtomCount')
-    normalize_self_feat(mol_graphs, 'Chi0')
-    normalize_self_feat(mol_graphs, 'Chi0v')
-    # 5
-    normalize_self_feat(mol_graphs, 'TPSA')
-    normalize_self_feat(mol_graphs, 'fr_Al_OH')
-    # 7
-    normalize_self_feat(mol_graphs, 'NumHAcceptors')
-    normalize_self_feat(mol_graphs, 'Chi4v')
-    # 10
-    normalize_self_feat(mol_graphs, 'NumRotatableBonds')
-    normalize_self_feat(mol_graphs, 'BCUT2D_CHGHI')
-    normalize_self_feat(mol_graphs, 'SMR_VSA9')
-    # 20
-    normalize_self_feat(mol_graphs, 'BertzCT')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA4')
+    normalize_self_feat(mol_graphs, 'Chi0n')
     normalize_self_feat(mol_graphs, 'Kappa1')
-    normalize_self_feat(mol_graphs, 'NumSaturatedCarbocycles')
-    normalize_self_feat(mol_graphs, 'MolLogP')
+    normalize_self_feat(mol_graphs, 'NHOHCount')
+    # 5
+    normalize_self_feat(mol_graphs, 'Chi4n')
+    normalize_self_feat(mol_graphs, 'BCUT2D_CHGHI')
+    # 7
+    normalize_self_feat(mol_graphs, 'NumAliphaticHeterocycles')
+    normalize_self_feat(mol_graphs, 'SMR_VSA7')
+    # 10
+    normalize_self_feat(mol_graphs, 'FractionCSP3')
+    normalize_self_feat(mol_graphs, 'BertzCT')
+    normalize_self_feat(mol_graphs, 'SMR_VSA10')
+    # 20
+    normalize_self_feat(mol_graphs, 'NumRotatableBonds')
     normalize_self_feat(mol_graphs, 'BalabanJ')
-    normalize_self_feat(mol_graphs, 'SlogP_VSA10')
-    normalize_self_feat(mol_graphs, 'VSA_EState4')
-    normalize_self_feat(mol_graphs, 'VSA_EState7')
-    normalize_self_feat(mol_graphs, 'fr_Ar_OH')
+    normalize_self_feat(mol_graphs, 'fr_Al_OH')
+    normalize_self_feat(mol_graphs, 'fr_term_acetylene')
+    normalize_self_feat(mol_graphs, 'fr_Ar_N')
+    normalize_self_feat(mol_graphs, 'BCUT2D_MWLOW')
+    normalize_self_feat(mol_graphs, 'fr_NH1')
+    normalize_self_feat(mol_graphs, 'FpDensityMorgan3')
+    normalize_self_feat(mol_graphs, 'BCUT2D_LOGPLOW')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA4')
     ####################################################
 
     return samples
