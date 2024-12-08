@@ -144,7 +144,6 @@ def read_dataset(file_name):
             mol_graph.fr_NH1 = dsc.fr_NH1(mol)
             mol_graph.VSA_EState7 = dsc.VSA_EState7(mol)
             mol_graph.qed = dsc.qed(mol)
-
             ####################################################
 
             samples.append((mol_graph, target[i]))

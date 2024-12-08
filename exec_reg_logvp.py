@@ -13,6 +13,7 @@ from model import EGCN_5
 from model import EGCN_7
 from model import EGCN_10
 from model import EGCN_20
+from model import EGCN_20_e2
 
 from model import Extended_EGCN
 from model import Extended_EGCN_3
@@ -20,7 +21,6 @@ from model import Extended_EGCN_5
 from model import Extended_EGCN_7
 from model import Extended_EGCN_10
 from model import Extended_EGCN_20
-from model import Extended_EGCN_20_e2
 from model import Extended_EGCN_sf
 from model import Extended_EGCN_sf_e2
 
@@ -55,8 +55,8 @@ print(device)
 # experiment parameters
 dataset_name = 'logVP2'
 batch_size = 32
-max_epochs = 1
-k = 2
+max_epochs = 300
+k = 5
 
 
 def collate(samples):
@@ -279,6 +279,7 @@ model_EGCN_7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
 model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
+model_EGCN_20_e2 = EGCN_20_e2.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # Extended_EGCN
 model_Extended_EGCN_3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
@@ -287,7 +288,7 @@ model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
 model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
-model_Extended_EGCN_20_e2 = Extended_EGCN_20_e2.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_Extended_EGCN_20_e2 = EGCN_20_e2.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 model_Extended_EGCN_sf = Extended_EGCN_sf.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
 model_Extended_EGCN_sf_e2 = Extended_EGCN_sf_e2.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
@@ -329,9 +330,16 @@ test_losses = dict()
 # print('test loss (EGCN_10): ' + str(test_losses['EGCN_10']))
 
 # # feature 20개
+# Embedding: 1
 # print('--------- EGCN_20 ---------')
 # test_losses['EGCN_20'] = trainer.cross_validation(dataset, model_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
 # print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
+
+# # feature 20개
+# Embedding: 2
+# print('--------- EGCN_20_e2 ---------')
+# test_losses['EGCN_20_e2'] = trainer.cross_validation(dataset, model_EGCN_20_e2, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+# print('test loss (EGCN_20_e2): ' + str(test_losses['EGCN_20_e2']))
 
 
 #=====================================================================#
@@ -359,11 +367,13 @@ test_losses = dict()
 # print('test loss (Extended_EGCN_10): ' + str(test_losses['Extended_EGCN_10']))
 
 # # feature 20개
+# Embedding: 1
 # print('--------- Exteded EGCN_20 ---------')
 # test_losses['Extended_EGCN_20'] = trainer.cross_validation(dataset, model_Extended_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
 # print('test loss (Extended_EGCN_20): ' + str(test_losses['Extended_EGCN_20']))
 
 # # feature 20개
+# Embedding: 2
 # print('--------- Exteded EGCN_20_e2 ---------')
 # test_losses['Extended_EGCN_20_e2'] = trainer.cross_validation(dataset, model_Extended_EGCN_20_e2, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
 # print('test loss (Extended_EGCN_20_e2): ' + str(test_losses['Extended_EGCN_20_e2']))
