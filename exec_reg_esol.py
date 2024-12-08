@@ -34,6 +34,7 @@ SEED = 100
 
 os.environ['PYTHONHASHSEED'] = str(SEED)
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 random.seed(SEED)
 np.random.seed(SEED)
