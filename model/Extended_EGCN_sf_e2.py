@@ -48,12 +48,20 @@ class Net(nn.Module):
         split_idx = dim_self_feat // 2 + dim_self_feat % 2
         self.split_idx = split_idx
 
-        self.fc1 = nn.Linear(20 * dim_self_feat, 256)
-        self.bn1 = nn.BatchNorm1d(256)
-        self.fc2 = nn.Linear(256 * dim_self_feat, 32)
-        self.bn2 = nn.BatchNorm1d(32)
-        self.fc3 = nn.Linear(32 , dim_out)
+        self.fc1 = nn.Linear(20 * dim_self_feat, 512)
+        self.fc2 = nn.Linear(512 * dim_self_feat, 8192)
+        self.fc3 = nn.Linear(8192, 2048)
+        self.fc4 = nn.Linear(2048, 512)
+        self.fc5 = nn.Linear(512, 128)
+        self.fc6 = nn.Linear(128, 32)
+        self.fc7 = nn.Linear(32 , dim_out)
 
+        self.bn1 = nn.BatchNorm1d(512)
+        self.bn2 = nn.BatchNorm1d(8192)
+        self.bn3 = nn.BatchNorm1d(2048)
+        self.bn4 = nn.BatchNorm1d(512)
+        self.bn5 = nn.BatchNorm1d(128)
+        self.bn6 = nn.BatchNorm1d(32)
         self.dropout = nn.Dropout(0.3)
 
     def forward(self, g, self_feat):
@@ -63,6 +71,7 @@ class Net(nn.Module):
 
         hg = dgl.mean_nodes(g, 'h')
 
+        # embedding 1
         hg = hg.unsqueeze(2)
         self_feat = self_feat.unsqueeze(1)
         hg = torch.bmm(hg, self_feat)
@@ -71,11 +80,26 @@ class Net(nn.Module):
         out = F.relu(self.bn1(self.fc1(hg)))
         out = self.dropout(out)
 
+        # embedding 2
         out = out.unsqueeze(2)
         out = torch.bmm(out, self_feat)
         out = out.view(out.size(0), -1)
 
         out = F.relu(self.bn2(self.fc2(out)))
-        out = self.fc3(out)
+        out = self.dropout(out)
+
+        out = F.relu(self.bn3(self.fc3(out)))
+        out = self.dropout(out)
+
+        out = F.relu(self.bn4(self.fc4(out)))
+        out = self.dropout(out)
+
+        out = F.relu(self.bn5(self.fc5(out)))
+        out = self.dropout(out)
+
+        out = F.relu(self.bn6(self.fc6(out)))
+        out = self.dropout(out)
+
+        out = self.fc7(out)
 
         return out

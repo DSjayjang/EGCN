@@ -62,6 +62,7 @@ class Net(nn.Module):
 
         hg = dgl.mean_nodes(g, 'h')
 
+        # embedding 1
         hg = hg.unsqueeze(2)
         self_feat = self_feat.unsqueeze(1)
         hg = torch.bmm(hg, self_feat)
@@ -69,8 +70,10 @@ class Net(nn.Module):
 
         out = F.relu(self.bn1(self.fc1(hg)))
         out = self.dropout(out)
+
         out = F.relu(self.bn2(self.fc2(out)))
         out = self.dropout(out)
+
         out = F.relu(self.bn3(self.fc3(out)))
 
         out = self.fc4(out)

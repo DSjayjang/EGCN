@@ -13,6 +13,7 @@ from model import EGCN_5
 from model import EGCN_7
 from model import EGCN_10
 from model import EGCN_20
+from model import EGCN_20_e2
 
 from model import Extended_EGCN
 from model import Extended_EGCN_3
@@ -20,7 +21,10 @@ from model import Extended_EGCN_5
 from model import Extended_EGCN_7
 from model import Extended_EGCN_10
 from model import Extended_EGCN_20
+from model import Extended_EGCN_20_e2
+
 from model import Extended_EGCN_sf
+from model import Extended_EGCN_sf_e2
 
 from model import Bilinear_EGCN
 from model import test_EGCN
@@ -53,8 +57,8 @@ print(device)
 # experiment parameters
 dataset_name = 'freesolv'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 3
+k = 2
 
 
 def collate(samples):
@@ -268,6 +272,10 @@ random.shuffle(dataset)
 random.shuffle(dataset_sf)
 
 
+#=====================================================================#
+#=========================== Embedding : 1 ===========================#
+#=====================================================================#
+
 # EGCN
 model_EGCN_3 = EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
 model_EGCN_5 = EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
@@ -282,14 +290,24 @@ model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
 model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
+# Self_Feature
 model_Extended_EGCN_sf = Extended_EGCN_sf.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
 
-# Bilinear_EGCN
-# model_Bilinear_EGCN_3 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
-# model_Bilinear_EGCN_5 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 5).to(device)
-# model_Bilinear_EGCN_7 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 7).to(device)
-# model_Bilinear_EGCN_10 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 10).to(device)
-# model_Bilinear_EGCN_20 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 20).to(device)
+
+#=====================================================================#
+#=========================== Embedding : 2 ===========================#
+#=====================================================================#
+
+# EGCN
+model_EGCN_20_e2 = EGCN_20_e2.Net(mc.dim_atomic_feat, 1, 20).to(device)
+
+# Extended_EGCN
+model_Extended_EGCN_20_e2 = Extended_EGCN_20_e2.Net(mc.dim_atomic_feat, 1, 20).to(device)
+
+# Self_Feature
+model_Extended_EGCN_sf_e2 = Extended_EGCN_sf_e2.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
+
+
 
 # define loss function
 criterion = nn.L1Loss(reduction='sum')
@@ -299,6 +317,10 @@ test_losses = dict()
 
 
 #=====================================================================#
+#=========================== Embedding : 1 ===========================#
+#=====================================================================#
+
+#------------------------ EGCN ------------------------#
 
 # # feature 3개
 # print('--------- EGCN_3 ---------')
@@ -326,7 +348,7 @@ test_losses = dict()
 # print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
 
 
-#=====================================================================#
+#------------------------ Extended EGCN ------------------------#
 
 # # feature 3개
 # print('--------- Exteded EGCN_3 ---------')
@@ -354,40 +376,27 @@ test_losses = dict()
 # print('test loss (Extended_EGCN_20): ' + str(test_losses['Extended_EGCN_20']))
 
 
+#------------------------ Self Feature ------------------------#
+
+# print('--------- Exteded EGCN_sf ---------')
+# test_losses['Extended_EGCN_sf'] = trainer.cross_validation(dataset_sf, model_Extended_EGCN_sf, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_sf)
+# print('test loss (Extended_EGCN_sf): ' + str(test_losses['Extended_EGCN_sf']))
+
+
+#=====================================================================#
+#=========================== Embedding : 2 ===========================#
 #=====================================================================#
 
-# self_feature
-print('--------- Exteded EGCN_sf ---------')
-test_losses['Extended_EGCN_sf'] = trainer.cross_validation(dataset_sf, model_Extended_EGCN_sf, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_sf)
-print('test loss (Extended_EGCN_sf): ' + str(test_losses['Extended_EGCN_sf']))
+# print('--------- EGCN_20_e2 ---------')
+# test_losses['EGCN_20_e2'] = trainer.cross_validation(dataset, model_EGCN_20_e2, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+# print('test loss (EGCN_20_e2): ' + str(test_losses['EGCN_20_e2']))
 
+# print('--------- Exteded EGCN_20_e2 ---------')
+# test_losses['Extended_EGCN_20_e2'] = trainer.cross_validation(dataset, model_Extended_EGCN_20_e2, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_20)
+# print('test loss (Extended_EGCN_20_e2): ' + str(test_losses['Extended_EGCN_20_e2']))
 
-#=====================================================================#
-
-# Bilinear_EGCN
-# # feature 3개
-# print('--------- Bilinear EGCN_3 ---------')
-# test_losses['Bilinear_EGCN_3'] = trainer.cross_validation(dataset, model_Bilinear_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended)
-# print('test loss (Bilinear_EGCN_3): ' + str(test_losses['Bilinear_EGCN3']))
-
-# # feature 5개
-# print('--------- Bilinear EGCN_5 ---------')
-# test_losses['Bilinear_EGCN_5'] = trainer.cross_validation(dataset, model_Bilinear_EGCN_5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended)
-# print('test loss (Bilinear_EGCN_5): ' + str(test_losses['Bilinear_EGCN_5']))
-
-# # feature 7개
-# print('--------- Bilinear EGCN_7 ---------')
-# test_losses['Bilinear_EGCN_7'] = trainer.cross_validation(dataset, model_Bilinear_EGCN_7, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended)
-# print('test loss (Bilinear_EGCN_7): ' + str(test_losses['Bilinear_EGCN_7']))
-
-# # feature 10개
-# print('--------- Bilinear EGCN_10 ---------')
-# test_losses['Bilinear_EGCN_10'] = trainer.cross_validation(dataset, model_Bilinear_EGCN_10, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended)
-# print('test loss (Bilinear_EGCN_10): ' + str(test_losses['Bilinear_EGCN_10']))
-
-# # feature 20개
-# print('--------- Bilinear EGCN_20 ---------')
-# test_losses['Bilinear_EGCN_20'] = trainer.cross_validation(dataset, model_Bilinear_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended)
-# print('test loss (Bilinear_EGCN_20): ' + str(test_losses['Bilinear_EGCN_20']))
+print('--------- Exteded EGCN_sf_e2 ---------')
+test_losses['Extended_EGCN_sf_e2'] = trainer.cross_validation(dataset_sf, model_Extended_EGCN_sf_e2, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_Extended_sf)
+print('test loss (Extended_EGCN_sf_e2): ' + str(test_losses['Extended_EGCN_sf_e2']))
 
 print(test_losses)

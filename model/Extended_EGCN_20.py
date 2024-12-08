@@ -67,8 +67,8 @@ class Net(nn.Module):
 
         out = F.relu(self.bn1(self.fc1(hg)))
         out = self.dropout(out)
-        out = F.relu(self.bn2(self.fc2(out)))
 
+        out = F.relu(self.bn2(self.fc2(out)))
         out = self.fc3(out)
 
 
