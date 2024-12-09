@@ -53,8 +53,8 @@ print(device)
 # experiment parameters
 dataset_name = 'esol'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 5
+k = 2
 
 
 def collate(samples):

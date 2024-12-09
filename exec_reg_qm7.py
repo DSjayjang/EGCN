@@ -50,8 +50,8 @@ print(device)
 # experiment parameters
 dataset_name = 'qm7_reduced'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):

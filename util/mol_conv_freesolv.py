@@ -7,6 +7,7 @@ from rdkit import Chem
 from util import util
 #from mendeleev import get_table
 from mendeleev.fetch import fetch_table
+import traceback # 예외정보 추적
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 sel_prop_names = ['atomic_weight',
@@ -51,7 +52,7 @@ def read_atom_prop():
 
 
 def construct_mol_graph(smiles, mol, adj_mat, feat_mat):
-    molGraph = molDGLGraph(smiles, adj_mat, feat_mat, mol)
+    molGraph = molDGLGraph(smiles, adj_mat, feat_mat, mol).to(device)
     edges = util.adj_mat_to_edges(adj_mat)
     src, dst = tuple(zip(*edges))
 
@@ -74,8 +75,9 @@ def smiles_to_mol_graph(smiles):
             ind = ind + 1
 
         return mol, construct_mol_graph(smiles, mol, adj_mat, node_feat_mat)
-    except:
-        print(smiles + ' could not be converted to molecular graph due to the internal errors of RDKit')
+    except Exception as e:
+        print(f"Error processing SMILES: {smiles}")
+        print(traceback.format_exc())  # 예외 정보를 출력
         return None, None
 
 

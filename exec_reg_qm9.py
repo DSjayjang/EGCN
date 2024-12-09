@@ -20,7 +20,6 @@ from model import Extended_EGCN_5
 from model import Extended_EGCN_7
 from model import Extended_EGCN_10
 from model import Extended_EGCN_20
-from model import Extended_EGCN_sf_qm9
 
 from model import Bilinear_EGCN
 from model import test_EGCN
@@ -52,8 +51,8 @@ print(device)
 # experiment parameters
 dataset_name = 'qm9_hc_reduced'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):

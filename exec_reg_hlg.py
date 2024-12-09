@@ -53,8 +53,8 @@ print(device)
 # experiment parameters
 dataset_name = 'hlg_reduced'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 2
+k = 1
 
 
 def collate(samples):
@@ -284,12 +284,6 @@ model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(devi
 
 # model_Extended_EGCN_sf = Extended_EGCN_sf.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
 
-# Bilinear_EGCN
-# model_Bilinear_EGCN_3 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
-# model_Bilinear_EGCN_5 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 5).to(device)
-# model_Bilinear_EGCN_7 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 7).to(device)
-# model_Bilinear_EGCN_10 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 10).to(device)
-# model_Bilinear_EGCN_20 = Bilinear_EGCN.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # define loss function
 criterion = nn.L1Loss(reduction='sum')
