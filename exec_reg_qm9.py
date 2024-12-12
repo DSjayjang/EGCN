@@ -15,11 +15,11 @@ from model import EGCN_10
 from model import EGCN_20
 
 from model import Extended_EGCN
-from model import Extended_EGCN_3
-from model import Extended_EGCN_5
-from model import Extended_EGCN_7
-from model import Extended_EGCN_10
-from model import Extended_EGCN_20
+from model import Outer_EGCN_3
+from model import Outer_EGCN_5
+from model import Outer_EGCN_7
+from model import Outer_EGCN_10
+from model import Outer_EGCN_20
 
 from model import Bilinear_EGCN
 from model import test_EGCN
@@ -280,11 +280,11 @@ model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # Extended_EGCN
-model_Extended_EGCN_3 = Extended_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_Extended_EGCN_5 = Extended_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_Extended_EGCN_7 = Extended_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-model_Extended_EGCN_10 = Extended_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-model_Extended_EGCN_20 = Extended_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_Extended_EGCN_3 = Outer_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
+model_Extended_EGCN_5 = Outer_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
+model_Extended_EGCN_7 = Outer_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+model_Extended_EGCN_10 = Outer_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
+model_Extended_EGCN_20 = Outer_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # model_Extended_EGCN_sf = Extended_EGCN_sf_qm9.Net(mc_sf.dim_atomic_feat, 1, mc_sf.dim_self_feat).to(device)
 

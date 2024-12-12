@@ -19,7 +19,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 41
+dim_self_feat = 40
 
 
 class molDGLGraph(dgl.DGLGraph):

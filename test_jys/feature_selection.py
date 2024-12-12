@@ -16,7 +16,7 @@ random.seed(SEED)
 np.random.seed(SEED)
 
 # data load
-df_name = 'lipo'
+df_name = 'freesolv'
 df = pd.read_csv('C:\Programming\Github\EGCN\data\\' + df_name + '.csv')
 
 smiles_list = df['smiles'].tolist()
@@ -61,16 +61,11 @@ num_all_features = df_all_features.shape[1] - 1  # logvp 열 제외
 print("초기 변수 개수:", num_all_features)
 
 # NA 확인
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
 df_all_features[df_all_features.isna().any(axis = 1)]
 
 # 결측치가 포함된 feature 개수
 print('결측치가 포함된 열 개수:', df_all_features.isna().any(axis = 0).sum(), '\n')
 print(df_all_features.isna().any(axis = 0))
-
-pd.reset_option('display.max_rows')
-pd.reset_option('display.max_columns')
 
 # 결측치가 포함된 feature 제거
 df_removed_features = df_all_features.dropna(axis = 1)
@@ -91,8 +86,9 @@ print("제거 후 남은 feature 개수:", num_removed_features, '\n')
 print(df_removed_features.shape)
 
 
-# 너무 낮은 variance를 가지는 경우
+df_removed_features
 
+# 너무 낮은 variance
 low_variances = sorted(df_removed_features.var())
 low_variances[:10]
 
@@ -116,8 +112,8 @@ print("제거 후 남은 feature 개수:", num_removed_features, '\n')
 print(df_removed_features.shape)
 
 
-# 데이터 스크리닝
 
+# 데이터 스크리닝
 X_train = df_removed_features.drop(columns = 'target')
 y_train = df_removed_features['target']
 
@@ -175,6 +171,7 @@ model1 = SIS.SIS(X_train_scaling,y_train,
     standardize=False)
 
 
+
 # 선택된 feature들의 index
 selected_features_ISIS = np.array(model1.rx2('ix'))
 
@@ -193,9 +190,7 @@ print(selected_features)
 df_ISIS = df_removed_features[list(selected_features) + ['target']]
 df_ISIS
 
-
 # 엘라스틱 넷
-
 from sklearn.linear_model import ElasticNet
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.model_selection import KFold
@@ -251,44 +246,50 @@ best_elastic_net = ElasticNet(
     fit_intercept=True
 )
 
-
-# 학습
 best_elastic_net.fit(X_train_scaling, y_train)
 
-# 회귀 계수
+# 예측값
+y_pred = best_elastic_net.predict(X_train_scaling)
 coefficients = best_elastic_net.coef_
 
-# feature와 계수 매핑
-final_selected_features = pd.DataFrame({'Feature' : X_train.columns,
-                                       'Coefficient' : coefficients})
-# 계수
-final_selected_features = abs(final_selected_features['Coefficient']).sort_values(ascending = False)
-final_selected_features_index = final_selected_features.index
-final_selected_features_index
+# 잔차
+residuals = y_train - y_pred
+# 잔차 제곱합 SSE
+SSE = np.sum(residuals**2)
+# n-p-1
+n_p_1 = len(y_train) - X_train_scaling.shape[1] - 1
+# 잔차의 표준편차 / 오차분산의 불편추정치
+residual_std = np.sqrt(SSE / n_p_1)
+
+# 표준 오차 계산
+# (X^{T} * X)^{-1}의 대각선 값 추출
+X = np.array(X_train_scaling)
+XtX_inv_diag = np.diag(np.linalg.inv(np.dot(X.T, X)))
+# 표준 오차
+standard_errors = residual_std * np.sqrt(XtX_inv_diag)
+
+# t-통계량 계산
+t_statistics = best_elastic_net.coef_ / standard_errors
+
+# elastic 모형
+e_model = pd.DataFrame({'feature' : X_train.columns,
+                        'coef' : coefficients,
+                        't-value' : t_statistics,
+                        'abs(t-value)' : abs(t_statistics)})
+e_model = e_model.sort_values(by='abs(t-value)', ascending = False)
+e_model
+
+
+e_model[e_model['abs(t-value)'] > 3].index
+
+# t-통계량이 3 이상인 변수만 출력
+final_selected_features_index = e_model[e_model['abs(t-value)'] > 3].index
 
 # 최종 변수 출력
 num_features = [3, 5, 7, 10, 20]
-dfs = {}
 
 for i in num_features:
-    print(f'변수 {i}개: ', list(X_train.columns[final_selected_features_index[: i]]), '\n')
-    dfs[f'df_name_{i}'] = list(X_train.columns[final_selected_features_index[: i]])
+    print(f'{df_name}_{i} =', list(X_train.columns[final_selected_features_index[: i]]))
 
-
-# OLS
-
-import statsmodels.api as sm
-
-X_selected = X_train.iloc[:, best_elastic_net.coef_ != 0]  # 계수가 0이 아닌 변수만 선택
-ols_model = sm.OLS(y_train, X_selected).fit()
-
-ols_model.summary()
-
-df_coef = pd.DataFrame({'coef' : ols_model.params,
-                        'pvalue' : ols_model.pvalues,
-                        'abs_coef' : abs(ols_model.params)})
-df_coef = df_coef[df_coef['pvalue'] <= 0.05]
-df_coef = df_coef.sort_values(by = ['pvalue', 'abs_coef'], ascending = [True, False])
-
-print(list(df_coef.index))
-print(len(list(df_coef.index)))
+print(f'\n#{len(e_model[e_model["abs(t-value)"] > 3].feature)}개')
+print(f'{df_name}_elastic =', list(e_model[e_model['abs(t-value)'] > 3].feature))
