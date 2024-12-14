@@ -45,7 +45,7 @@ class Net(nn.Module):
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
 
-        self.fc1 = nn.Linear(20 * 20, 256)
+        self.fc1 = nn.Linear(20 * dim_self_feat, 256) 
         self.fc2 = nn.Linear(256, 32)
         self.fc3 = nn.Linear(32, dim_out)
 
