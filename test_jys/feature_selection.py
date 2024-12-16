@@ -16,7 +16,7 @@ random.seed(SEED)
 np.random.seed(SEED)
 
 # data load
-df_name = 'freesolv'
+df_name = 'hlg'
 df = pd.read_csv('C:\Programming\Github\EGCN\data\\' + df_name + '.csv')
 
 smiles_list = df['smiles'].tolist()
@@ -248,48 +248,122 @@ best_elastic_net = ElasticNet(
 
 best_elastic_net.fit(X_train_scaling, y_train)
 
-# 예측값
-y_pred = best_elastic_net.predict(X_train_scaling)
+# 적합
+best_elastic_net.fit(X_train_scaling, y_train)
+
 coefficients = best_elastic_net.coef_
+coefficients.size
 
-# 잔차
-residuals = y_train - y_pred
-# 잔차 제곱합 SSE
-SSE = np.sum(residuals**2)
-# n-p-1
-n_p_1 = len(y_train) - X_train_scaling.shape[1] - 1
-# 잔차의 표준편차 / 오차분산의 불편추정치
-residual_std = np.sqrt(SSE / n_p_1)
+# 엘라스틱넷 적합이후 모든 변수
+print(f'# {len(X_train.loc[:, best_elastic_net.coef_ != 0].columns)}개')
+print(f'{df_name}_all =', list(X_train.loc[:, best_elastic_net.coef_ != 0].columns), '\n')
 
-# 표준 오차 계산
-# (X^{T} * X)^{-1}의 대각선 값 추출
-X = np.array(X_train_scaling)
-XtX_inv_diag = np.diag(np.linalg.inv(np.dot(X.T, X)))
-# 표준 오차
-standard_errors = residual_std * np.sqrt(XtX_inv_diag)
+from sklearn.inspection import permutation_importance
 
-# t-통계량 계산
-t_statistics = best_elastic_net.coef_ / standard_errors
+r = permutation_importance(best_elastic_net, X_test_scaling, y_test,
+                           n_repeats=100,
+                           random_state=0)
+for i in r.importances_mean.argsort()[::-1]:
+    if r.importances_mean[i] - 1.96 * r.importances_std[i] > 0:
+        print(f"{X_train.columns[i]:<30} \t"
+              f"{r.importances_mean[i]:.3f}"
+              f" +/- {r.importances_std[i]:.3f}")
 
-# elastic 모형
-e_model = pd.DataFrame({'feature' : X_train.columns,
-                        'coef' : coefficients,
-                        't-value' : t_statistics,
-                        'abs(t-value)' : abs(t_statistics)})
-e_model = e_model.sort_values(by='abs(t-value)', ascending = False)
-e_model
+from scipy.stats import norm
+
+# 순열 검정 수행
+permutation_scores = []
+for _ in range(1000):  # 1000회 순열
+    shuffled_y = np.random.permutation(y_test)
+    score = permutation_importance(best_elastic_net, X_test_scaling, shuffled_y,
+                                   n_repeats = 30, random_state = SEED)
+    permutation_scores.append(score.importances_mean)
+
+# 귀무가설 하 분포 생성
+null_distribution = np.array(permutation_scores)
 
 
-e_model[e_model['abs(t-value)'] > 3].index
+# p-value 계산
+p_values = []
+for i, mean in enumerate(r.importances_mean):
+    # 단측 검정: 귀무가설 하 중요도 > 관측 중요도
+    p_value = (null_distribution[:, i] >= mean).mean()
+    p_values.append(p_value)
 
-# t-통계량이 3 이상인 변수만 출력
-final_selected_features_index = e_model[e_model['abs(t-value)'] > 3].index
+df_pvalues = pd.DataFrame()
+col = []
+pval = []
+imp = []
+
+for i, p in enumerate(p_values):
+    col.append(X_train.columns[i])
+    imp.append(r.importances_mean[i])
+    pval.append(p)
+
+df_pvalues['Feature'] = col
+df_pvalues['Importance'] = imp
+df_pvalues['p-value'] = pval
+
+df_pvalues = df_pvalues.sort_values(by = 'Importance', ascending = False)
+print(df_pvalues)
+
+# 유의수준 0.05 이하인 변수 - 중요도 순으로 정렬 후 출력
+df_pvalues_005 = df_pvalues[df_pvalues['p-value'] <= 0.05]
+df_pvalues_005 = df_pvalues_005.sort_values(by = 'Importance', ascending = False)
+
+print(df_pvalues_005)
 
 # 최종 변수 출력
 num_features = [3, 5, 7, 10, 20]
 
 for i in num_features:
-    print(f'{df_name}_{i} =', list(X_train.columns[final_selected_features_index[: i]]))
+    print(f'{df_name}_{i} =', list(df_pvalues_005['Feature'][: i]))
 
-print(f'\n#{len(e_model[e_model["abs(t-value)"] > 3].feature)}개')
-print(f'{df_name}_elastic =', list(e_model[e_model['abs(t-value)'] > 3].feature))
+print(f'# {len(df_pvalues_005)}개')
+print(f'{df_name}_elastic =', list(df_pvalues_005['Feature']))
+
+# # 예측값
+# y_pred = best_elastic_net.predict(X_train_scaling)
+# coefficients = best_elastic_net.coef_
+
+# # 잔차
+# residuals = y_train - y_pred
+# # 잔차 제곱합 SSE
+# SSE = np.sum(residuals**2)
+# # n-p-1
+# n_p_1 = len(y_train) - X_train_scaling.shape[1] - 1
+# # 잔차의 표준편차 / 오차분산의 불편추정치
+# residual_std = np.sqrt(SSE / n_p_1)
+
+# # 표준 오차 계산
+# # (X^{T} * X)^{-1}의 대각선 값 추출
+# X = np.array(X_train_scaling)
+# XtX_inv_diag = np.diag(np.linalg.inv(np.dot(X.T, X)))
+# # 표준 오차
+# standard_errors = residual_std * np.sqrt(XtX_inv_diag)
+
+# # t-통계량 계산
+# t_statistics = best_elastic_net.coef_ / standard_errors
+
+# # elastic 모형
+# e_model = pd.DataFrame({'feature' : X_train.columns,
+#                         'coef' : coefficients,
+#                         't-value' : t_statistics,
+#                         'abs(t-value)' : abs(t_statistics)})
+# e_model = e_model.sort_values(by='abs(t-value)', ascending = False)
+# e_model
+
+
+# e_model[e_model['abs(t-value)'] > 3].index
+
+# # t-통계량이 3 이상인 변수만 출력
+# final_selected_features_index = e_model[e_model['abs(t-value)'] > 3].index
+
+# # 최종 변수 출력
+# num_features = [3, 5, 7, 10, 20]
+
+# for i in num_features:
+#     print(f'{df_name}_{i} =', list(X_train.columns[final_selected_features_index[: i]]))
+
+# print(f'\n#{len(e_model[e_model["abs(t-value)"] > 3].feature)}개')
+# print(f'{df_name}_elastic =', list(e_model[e_model['abs(t-value)'] > 3].feature))
