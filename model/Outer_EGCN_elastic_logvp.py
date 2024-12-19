@@ -51,7 +51,6 @@ class Net(nn.Module):
 
         self.bn1 = nn.BatchNorm1d(256)
         self.bn2 = nn.BatchNorm1d(32)
-        self.bn3 = nn.BatchNorm1d(8)
         self.dropout = nn.Dropout(0.3)
 
     def forward(self, g, self_feat):
