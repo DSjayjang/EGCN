@@ -125,27 +125,27 @@ def read_dataset(file_name):
 
             ####################################################
             # 1
-            mol_graph.RingCount = dsc.RingCount(mol)
             mol_graph.Chi1 = dsc.Chi1(mol)
             mol_graph.TPSA = dsc.TPSA(mol)
             mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
             mol_graph.NumHDonors = dsc.NumHDonors(mol)
-            # 6
             mol_graph.fr_ether = dsc.fr_ether(mol)
+            # 6
             mol_graph.EState_VSA1 = dsc.EState_VSA1(mol)
             mol_graph.NumAliphaticHeterocycles = dsc.NumAliphaticHeterocycles(mol)
             mol_graph.EState_VSA5 = dsc.EState_VSA5(mol)
             mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
-            # 11
             mol_graph.MinAbsEStateIndex = dsc.MinAbsEStateIndex(mol)
+            # 11
             mol_graph.NumHAcceptors = dsc.NumHAcceptors(mol)
             mol_graph.fr_COO = dsc.fr_COO(mol)
             mol_graph.SlogP_VSA8 = dsc.SlogP_VSA8(mol)
             mol_graph.SlogP_VSA1 = dsc.SlogP_VSA1(mol)
-            # 16
             mol_graph.VSA_EState9 = dsc.VSA_EState9(mol)
+            # 16
             mol_graph.fr_azo = dsc.fr_azo(mol)
             mol_graph.EState_VSA9 = dsc.EState_VSA9(mol)
+            mol_graph.RingCount = dsc.RingCount(mol)
             mol_graph.PEOE_VSA11 = dsc.PEOE_VSA11(mol)
             mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
             # 21
@@ -183,27 +183,27 @@ def read_dataset(file_name):
 
     ####################################################
     # 1
-    normalize_self_feat(mol_graphs, 'RingCount')
     normalize_self_feat(mol_graphs, 'Chi1')
     normalize_self_feat(mol_graphs, 'TPSA')
     normalize_self_feat(mol_graphs, 'SMR_VSA10')
     normalize_self_feat(mol_graphs, 'NumHDonors')
-    # 6
     normalize_self_feat(mol_graphs, 'fr_ether')
+    # 6
     normalize_self_feat(mol_graphs, 'EState_VSA1')
     normalize_self_feat(mol_graphs, 'NumAliphaticHeterocycles')
     normalize_self_feat(mol_graphs, 'EState_VSA5')
     normalize_self_feat(mol_graphs, 'SlogP_VSA10')
-    # 11
     normalize_self_feat(mol_graphs, 'MinAbsEStateIndex')
+    # 11
     normalize_self_feat(mol_graphs, 'NumHAcceptors')
     normalize_self_feat(mol_graphs, 'fr_COO')
     normalize_self_feat(mol_graphs, 'SlogP_VSA8')
     normalize_self_feat(mol_graphs, 'SlogP_VSA1')
-    # 16
     normalize_self_feat(mol_graphs, 'VSA_EState9')
+    # 16
     normalize_self_feat(mol_graphs, 'fr_azo')
     normalize_self_feat(mol_graphs, 'EState_VSA9')
+    normalize_self_feat(mol_graphs, 'RingCount')
     normalize_self_feat(mol_graphs, 'PEOE_VSA11')
     normalize_self_feat(mol_graphs, 'VSA_EState8')
     # 21

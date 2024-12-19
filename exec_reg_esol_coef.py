@@ -296,8 +296,8 @@ model_Outer_EGCN_elastic = Outer_EGCN_elastic_esol.Net(mc.dim_atomic_feat, 1, mc
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum') # MAE
-# criterion = nn.MSELoss(reduction='sum') # MSE
+# criterion = nn.L1Loss(reduction='sum') # MAE
+criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
 test_losses = dict()
