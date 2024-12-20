@@ -120,50 +120,50 @@ def read_dataset(file_name):
 
             ####################################################
             # 1
-            mol_graph.RingCount = dsc.RingCount(mol)
-            mol_graph.MaxEStateIndex = dsc.MaxEStateIndex(mol)
-            mol_graph.MinPartialCharge = dsc.MinPartialCharge(mol)
-            mol_graph.Chi2v = dsc.Chi2v(mol)
-            mol_graph.Ipc = dsc.Ipc(mol)
-            # 6
-            mol_graph.Kappa2 = dsc.Kappa2(mol)
-            mol_graph.PEOE_VSA10 = dsc.PEOE_VSA10(mol)
-            mol_graph.PEOE_VSA14 = dsc.PEOE_VSA14(mol)
-            mol_graph.PEOE_VSA2 = dsc.PEOE_VSA2(mol)
-            mol_graph.PEOE_VSA7 = dsc.PEOE_VSA7(mol)
-            # 11
-            mol_graph.PEOE_VSA8 = dsc.PEOE_VSA8(mol)
-            mol_graph.SMR_VSA2 = dsc.SMR_VSA2(mol)
-            mol_graph.SMR_VSA5 = dsc.SMR_VSA5(mol)
-            mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
-            mol_graph.SlogP_VSA2 = dsc.SlogP_VSA2(mol)
-            # 16
-            mol_graph.SlogP_VSA4 = dsc.SlogP_VSA4(mol)
-            mol_graph.TPSA = dsc.TPSA(mol)
-            mol_graph.EState_VSA6 = dsc.EState_VSA6(mol)
-            mol_graph.EState_VSA8 = dsc.EState_VSA8(mol)
-            mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
-            # 21
             mol_graph.NHOHCount = dsc.NHOHCount(mol)
-            mol_graph.NumAromaticHeterocycles = dsc.NumAromaticHeterocycles(mol)
-            mol_graph.NumHDonors = dsc.NumHDonors(mol)
-            mol_graph.NumHeteroatoms = dsc.NumHeteroatoms(mol)
-            mol_graph.NumSaturatedHeterocycles = dsc.NumSaturatedHeterocycles(mol)
-            # 26
-            mol_graph.fr_Al_COO = dsc.fr_Al_COO(mol)
-            mol_graph.fr_Al_OH = dsc.fr_Al_OH(mol)
+            mol_graph.SMR_VSA5 = dsc.SMR_VSA5(mol)
+            mol_graph.SlogP_VSA2 = dsc.SlogP_VSA2(mol)
+            mol_graph.TPSA = dsc.TPSA(mol)
+            mol_graph.MaxEStateIndex = dsc.MaxEStateIndex(mol)
+            # 6
             mol_graph.fr_Ar_NH = dsc.fr_Ar_NH(mol)
+            mol_graph.Chi2v = dsc.Chi2v(mol)
+            mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
+            mol_graph.NumHeteroatoms = dsc.NumHeteroatoms(mol)
+            mol_graph.RingCount = dsc.RingCount(mol)
+            # 11
             mol_graph.fr_amide = dsc.fr_amide(mol)
-            mol_graph.fr_aryl_methyl = dsc.fr_aryl_methyl(mol)
-            # 31
+            mol_graph.NumAromaticHeterocycles = dsc.NumAromaticHeterocycles(mol)
+            mol_graph.PEOE_VSA14 = dsc.PEOE_VSA14(mol)
+            mol_graph.SlogP_VSA4 = dsc.SlogP_VSA4(mol)
+            mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
+            # 16
+            mol_graph.PEOE_VSA2 = dsc.PEOE_VSA2(mol)
+            mol_graph.PEOE_VSA10 = dsc.PEOE_VSA10(mol)
+            mol_graph.fr_Al_OH = dsc.fr_Al_OH(mol)
             mol_graph.fr_bicyclic = dsc.fr_bicyclic(mol)
+            mol_graph.SMR_VSA2 = dsc.SMR_VSA2(mol)
+            # 21
+            mol_graph.PEOE_VSA7 = dsc.PEOE_VSA7(mol)
+            mol_graph.MinPartialCharge = dsc.MinPartialCharge(mol)
+            mol_graph.fr_aryl_methyl = dsc.fr_aryl_methyl(mol)
+            mol_graph.NumSaturatedHeterocycles = dsc.NumSaturatedHeterocycles(mol)
+            mol_graph.NumHDonors = dsc.NumHDonors(mol)
+            # 26
             mol_graph.fr_imidazole = dsc.fr_imidazole(mol)
-            mol_graph.fr_imide = dsc.fr_imide(mol)
-            mol_graph.fr_ketone_Topliss = dsc.fr_ketone_Topliss(mol)
-            mol_graph.fr_nitro_arom_nonortho = dsc.fr_nitro_arom_nonortho(mol)
-            # 36
-            mol_graph.fr_para_hydroxylation = dsc.fr_para_hydroxylation(mol)
             mol_graph.fr_phos_ester = dsc.fr_phos_ester(mol)
+            mol_graph.fr_Al_COO = dsc.fr_Al_COO(mol)
+            mol_graph.EState_VSA6 = dsc.EState_VSA6(mol)
+            mol_graph.PEOE_VSA8 = dsc.PEOE_VSA8(mol)
+            # 31
+            mol_graph.fr_ketone_Topliss = dsc.fr_ketone_Topliss(mol)
+            mol_graph.fr_imide = dsc.fr_imide(mol)
+            mol_graph.fr_nitro_arom_nonortho = dsc.fr_nitro_arom_nonortho(mol)
+            mol_graph.EState_VSA8 = dsc.EState_VSA8(mol)
+            mol_graph.fr_para_hydroxylation = dsc.fr_para_hydroxylation(mol)
+            # 36
+            mol_graph.Kappa2 = dsc.Kappa2(mol)
+            mol_graph.Ipc = dsc.Ipc(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
@@ -171,50 +171,50 @@ def read_dataset(file_name):
 
     ####################################################
     # 1
-    normalize_self_feat(mol_graphs, 'RingCount')
-    normalize_self_feat(mol_graphs, 'MaxEStateIndex')
-    normalize_self_feat(mol_graphs, 'MinPartialCharge')
-    normalize_self_feat(mol_graphs, 'Chi2v')
-    normalize_self_feat(mol_graphs, 'Ipc')
-    # 6
-    normalize_self_feat(mol_graphs, 'Kappa2')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA10')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA14')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA2')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA7')
-    # 11
-    normalize_self_feat(mol_graphs, 'PEOE_VSA8')
-    normalize_self_feat(mol_graphs, 'SMR_VSA2')
-    normalize_self_feat(mol_graphs, 'SMR_VSA5')
-    normalize_self_feat(mol_graphs, 'SlogP_VSA10')
-    normalize_self_feat(mol_graphs, 'SlogP_VSA2')
-    # 16
-    normalize_self_feat(mol_graphs, 'SlogP_VSA4')
-    normalize_self_feat(mol_graphs, 'TPSA')
-    normalize_self_feat(mol_graphs, 'EState_VSA6')
-    normalize_self_feat(mol_graphs, 'EState_VSA8')
-    normalize_self_feat(mol_graphs, 'VSA_EState8')
-    # 21
     normalize_self_feat(mol_graphs, 'NHOHCount')
-    normalize_self_feat(mol_graphs, 'NumAromaticHeterocycles')
-    normalize_self_feat(mol_graphs, 'NumHDonors')
-    normalize_self_feat(mol_graphs, 'NumHeteroatoms')
-    normalize_self_feat(mol_graphs, 'NumSaturatedHeterocycles')
-    # 26
-    normalize_self_feat(mol_graphs, 'fr_Al_COO')
-    normalize_self_feat(mol_graphs, 'fr_Al_OH')
+    normalize_self_feat(mol_graphs, 'SMR_VSA5')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA2')
+    normalize_self_feat(mol_graphs, 'TPSA')
+    normalize_self_feat(mol_graphs, 'MaxEStateIndex')
+    # 6
     normalize_self_feat(mol_graphs, 'fr_Ar_NH')
+    normalize_self_feat(mol_graphs, 'Chi2v')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA10')
+    normalize_self_feat(mol_graphs, 'NumHeteroatoms')
+    normalize_self_feat(mol_graphs, 'RingCount')
+    # 11
     normalize_self_feat(mol_graphs, 'fr_amide')
-    normalize_self_feat(mol_graphs, 'fr_aryl_methyl')
-    # 31
+    normalize_self_feat(mol_graphs, 'NumAromaticHeterocycles')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA14')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA4')
+    normalize_self_feat(mol_graphs, 'VSA_EState8')
+    # 16
+    normalize_self_feat(mol_graphs, 'PEOE_VSA2')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA10')
+    normalize_self_feat(mol_graphs, 'fr_Al_OH')
     normalize_self_feat(mol_graphs, 'fr_bicyclic')
+    normalize_self_feat(mol_graphs, 'SMR_VSA2')
+    # 21
+    normalize_self_feat(mol_graphs, 'PEOE_VSA7')
+    normalize_self_feat(mol_graphs, 'MinPartialCharge')
+    normalize_self_feat(mol_graphs, 'fr_aryl_methyl')
+    normalize_self_feat(mol_graphs, 'NumSaturatedHeterocycles')
+    normalize_self_feat(mol_graphs, 'NumHDonors')
+    # 26
     normalize_self_feat(mol_graphs, 'fr_imidazole')
-    normalize_self_feat(mol_graphs, 'fr_imide')
-    normalize_self_feat(mol_graphs, 'fr_ketone_Topliss')
-    normalize_self_feat(mol_graphs, 'fr_nitro_arom_nonortho')
-    # 36
-    normalize_self_feat(mol_graphs, 'fr_para_hydroxylation')
     normalize_self_feat(mol_graphs, 'fr_phos_ester')
+    normalize_self_feat(mol_graphs, 'fr_Al_COO')
+    normalize_self_feat(mol_graphs, 'EState_VSA6')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA8')
+    # 31
+    normalize_self_feat(mol_graphs, 'fr_ketone_Topliss')
+    normalize_self_feat(mol_graphs, 'fr_imide')
+    normalize_self_feat(mol_graphs, 'fr_nitro_arom_nonortho')
+    normalize_self_feat(mol_graphs, 'EState_VSA8')
+    normalize_self_feat(mol_graphs, 'fr_para_hydroxylation')
+    # 36
+    normalize_self_feat(mol_graphs, 'Kappa2')
+    normalize_self_feat(mol_graphs, 'Ipc')
     ####################################################
 
     return samples
