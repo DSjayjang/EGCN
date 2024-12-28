@@ -359,10 +359,6 @@ test_losses = dict()
 
 #------------------------ Self Feature ------------------------#
 
-# print('--------- Outer EGCN_elastic ---------')
-# test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
-# print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
-
 print('--------- Outer EGCN_elastic ---------')
 test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
 print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
