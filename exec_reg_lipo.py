@@ -19,6 +19,7 @@ from model import Outer_EGCN_20
 from model import Outer_EGCN_elastic
 
 from util import trainer
+from util import trainer_test
 
 # 재현성-난수 고정
 import os
@@ -361,10 +362,13 @@ test_losses = dict()
 
 #------------------------ Self Feature ------------------------#
 
-print('--------- Outer EGCN_elastic ---------')
-test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
-print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
+# print('--------- Outer EGCN_elastic ---------')
+# test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
+# print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
 
+print('--------- Outer EGCN_elastic ---------')
+test_losses['Outer_EGCN_elastic'] = trainer_test.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic)
+print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
 
 #=====================================================================#
 #=========================== Embedding : 2 ===========================#
