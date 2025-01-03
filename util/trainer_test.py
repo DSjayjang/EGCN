@@ -9,7 +9,6 @@ import pandas as pd
 
 def train(model, criterion, optimizer, train_data_loader, max_epochs):
     model.train()
-    train_losses = []
 
     for epoch in range(0, max_epochs):
         train_loss = 0
@@ -23,18 +22,17 @@ def train(model, criterion, optimizer, train_data_loader, max_epochs):
             train_loss += loss.detach().item()
 
         train_loss /= len(train_data_loader.dataset)
-        train_losses.append(train_loss)  # Append train loss for each epoch
+
         print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
-    
-    return train_losses  # Return epoch-wise train losses
 
 
-def train_emodel(model, criterion, optimizer, train_data_loader, max_epochs):
-    model.train()
+def train_emodel(model, criterion, optimizer, train_data_loader, max_epochs, valid_data_loader):
 
     train_losses = [] # Train loss 저장
+    valid_losses = [] # Vaild loss 저장
 
     for epoch in range(0, max_epochs):
+        model.train()
         train_loss = 0
 
         for bg, self_feat, target in train_data_loader:
@@ -46,12 +44,25 @@ def train_emodel(model, criterion, optimizer, train_data_loader, max_epochs):
             train_loss += loss.detach().item()
 
         train_loss /= len(train_data_loader.dataset)
-
-
         train_losses.append(train_loss)  # Save loss for this epoch
 
         print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
-    return train_losses  # Epoch별 train loss 반환 
+
+        model.train()
+        valid_loss = 0
+
+        with torch.no_grad():
+            for bg, self_feat, target in valid_data_loader:
+                pred = model(bg, self_feat)
+                loss = criterion(pred, target)
+                valid_loss += loss.detach().item()
+
+            valid_loss /= len(valid_data_loader.dataset)
+            valid_losses.append(valid_loss)  # Save loss for this epoch
+
+            print('Epoch {}, train loss {:.4f}'.format(epoch + 1, valid_loss))
+
+    return train_losses, valid_losses  # Epoch별 train loss, valid loss 반환 
 
 
 def test(model, criterion, test_data_loader, accs=None):
@@ -149,7 +160,7 @@ def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epoch
 
     # Fold마다 손실 기록
     fold_train_losses = []  # 각 fold별 train loss
-    fold_test_losses = []   # 각 fold별 test loss
+    fold_valid_losses = []  # 각 fold별 train loss
 
     
     for k in range(num_folds):
@@ -168,38 +179,34 @@ def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epoch
 
 
         # Train the model for this fold
-        train_losses = train(models[k], criterion, optimizers[k], train_data_loader, max_epochs)  # 한 번에 max_epochs 실행
+        train_losses, valid_losses = train(models[k], criterion, optimizers[k], train_data_loader, max_epochs, test_data_loader)  # 한 번에 max_epochs 실행
         fold_train_losses.append(train_losses)
+        fold_valid_losses.append(valid_losses)
+
 
         # Test the model for this fold
         test_loss, pred = test(models[k], criterion, test_data_loader, accs)
         test_losses.append(test_loss)
-
-        fold_test_losses.append([test_loss] * max_epochs)  # 테스트 손실은 에포크당 동일하게 기록
-
-
- 
-        print(f"Fold {k+1}, Test Loss: {test_loss:.4f}")
 
     # Plot fold별 loss
     fig, axes = plt.subplots(1, num_folds, figsize=(5 * num_folds, 5), sharey=True)
     for k in range(num_folds):
         epochs = list(range(1, max_epochs + 1))
         axes[k].plot(epochs, fold_train_losses[k], label="Train Loss")
-        axes[k].plot(epochs, fold_test_losses[k], label="Test Loss")
+        axes[k].plot(epochs, fold_valid_losses[k], label="Validation Loss")
 
         axes[k].set_xlabel("Epoch")
         axes[k].set_ylabel("Loss")
         axes[k].legend()
         axes[k].set_title(f"Fold {k+1}")
 
-    plt.suptitle("Train and Test Loss Across Folds")
+    plt.suptitle("Train and Validation Loss Across Folds")
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
 
     # df 저장
-    train_losses_df = pd.DataFrame({'Fold': list(range(1, len(fold_train_losses) + 1)), 'Train Loss': fold_train_losses})
-    train_losses_df.to_csv('train_losses.csv', index = False)
+    Loss_df = pd.DataFrame({'Fold': list(range(1, len(fold_train_losses) + 1)), 'Train Loss': fold_train_losses, 'Validation Loss': fold_valid_losses})
+    Loss_df.to_csv('Loss.csv', index = False)
 
     if accs is None:
         return np.mean(test_losses)

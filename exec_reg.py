@@ -28,13 +28,13 @@ dgl.random.seed(SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-
+  
 # check GPU availability
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'lipo'
+dataset_name = 'freesolv'
 batch_size = 32
 max_epochs = 300
 k = 5
@@ -112,8 +112,8 @@ model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum')
-# criterion = nn.MSELoss(reduction='sum')
+# criterion = nn.L1Loss(reduction='sum')
+criterion = nn.MSELoss(reduction='sum')
 
 # train and evaluate competitors
 test_losses = dict()

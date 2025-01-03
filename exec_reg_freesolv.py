@@ -49,7 +49,7 @@ print(device)
 dataset_name = 'freesolv'
 batch_size = 32
 max_epochs = 300
-k = 5
+k = 2
 
 
 def collate(samples):
