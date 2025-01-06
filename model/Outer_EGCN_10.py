@@ -53,15 +53,6 @@ class Net(nn.Module):
         self.bn2 = nn.BatchNorm1d(16)
         self.dropout = nn.Dropout(0.3)
 
-        # 20개 보다 성능이 미세하게 더 좋음
-        # self.fc1 = nn.Linear(20 * 10, 128)
-        # self.fc2 = nn.Linear(128, 16)
-        # self.fc3 = nn.Linear(16, dim_out)
-
-        # self.bn1 = nn.BatchNorm1d(128)
-        # self.bn2 = nn.BatchNorm1d(16)
-        # self.dropout = nn.Dropout(0.3)
-
     def forward(self, g, self_feat):
         h = F.relu(self.gc1(g, g.ndata['feat']))
         h = F.relu(self.gc2(g, h))
