@@ -9,6 +9,9 @@ from model import EGCN
 from util import trainer
 from util import trainer_test
 
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
+
 # 재현성-난수 고정
 import os
 #import tensorflow as tf
@@ -36,7 +39,7 @@ print(device)
 # experiment parameters
 dataset_name = 'freesolv'
 batch_size = 32
-max_epochs = 5
+max_epochs = 300
 k = 5
 
 
@@ -100,6 +103,7 @@ def collate_emodel(samples):
 print('Data loading...')
 dataset = mc.read_dataset('data/' + dataset_name + '.csv')
 random.shuffle(dataset)
+train_dataset, test_dataset = train_test_split(dataset, test_size = 0.2, random_state = SEED)
 
 #=====================================================================#
 # default model
@@ -156,10 +160,15 @@ test_losses = dict()
 # print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
 
 print('--------- EGCN ---------')
-test_losses['EGCN'] = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
+test_losses['EGCN'], best_model = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
 print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
 print(test_losses)
 
+# 최종 평가
+test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel)
+final_test_loss, final_preds = trainer_test.final_test_emodel(best_model, criterion, test_data_loader)
+
+print(f'Final Test Loss: {final_test_loss}')
 #=====================================================================#
 
