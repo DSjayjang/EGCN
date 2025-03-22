@@ -36,8 +36,8 @@ print(device)
 # experiment parameters
 dataset_name = 'freesolv'
 batch_size = 32
-max_epochs = 5
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):
@@ -135,11 +135,11 @@ test_losses = dict()
 # test_losses['EGCN_S'] = trainer.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_scale)
 # print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
 
-# print('--------- EGCN ---------')
-# test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
-# print('test loss (EGCN): ' + str(test_losses['EGCN']))
+print('--------- EGCN ---------')
+test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
+print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
-# print(test_losses)
+print(test_losses)
 
 # #=====================================================================#
 
@@ -155,11 +155,11 @@ test_losses = dict()
 # test_losses['EGCN_S'] = trainer_test.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_scale)
 # print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
 
-print('--------- EGCN ---------')
-test_losses['EGCN'] = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
-print('test loss (EGCN): ' + str(test_losses['EGCN']))
+# print('--------- EGCN ---------')
+# test_losses['EGCN'] = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
+# print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
-print(test_losses)
+# print(test_losses)
 
 #=====================================================================#
 

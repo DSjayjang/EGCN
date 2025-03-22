@@ -54,25 +54,28 @@ class Net(nn.Module):
         self.bn3 = nn.BatchNorm1d(8)
         self.dropout = nn.Dropout(0.3)
 
+
     def forward(self, g, self_feat):
+        # 그래프 합성곱
         h = F.relu(self.gc1(g, g.ndata['feat']))
         h = F.relu(self.gc2(g, h))
         g.ndata['h'] = h
 
+        # 그래프 임베딩 생성
         hg = dgl.mean_nodes(g, 'h')
 
-        # embedding 1
+        # 통합
         hg = hg.unsqueeze(2)
         self_feat = self_feat.unsqueeze(1)
         hg = torch.bmm(hg, self_feat)
         hg = hg.view(hg.size(0), -1)
 
+        # FCNN
         out = F.relu(self.bn1(self.fc1(hg)))
         out = self.dropout(out)
 
         out = F.relu(self.bn2(self.fc2(out)))
 
         out = self.fc3(out)
-
 
         return out
