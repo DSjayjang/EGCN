@@ -34,7 +34,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'freesolv'
+dataset_name = 'esol'
 batch_size = 32
 max_epochs = 1
 k = 2
