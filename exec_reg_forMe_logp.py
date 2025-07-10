@@ -3,17 +3,17 @@ import torch.nn as nn
 import dgl
 import random
 import numpy as np
-import util.mol_conv_forMe as mc
+import util.mol_conv_forMe_logp as mc
 
-from model import EGCN_3
-from model import EGCN_5
-from model import EGCN_7
+from model import EGCN_3_copy
+from model import EGCN_5_copy
+from model import EGCN_7_copy
 from model import EGCN_10
 from model import EGCN_20
 
-from model import Outer_EGCN_3
-from model import Outer_EGCN_5
-from model import Outer_EGCN_7
+from model import Outer_EGCN_3_copy
+from model import Outer_EGCN_5_copy
+from model import Outer_EGCN_7_copy
 from model import Outer_EGCN_10
 from model import Outer_EGCN_20
 from model import Outer_EGCN_elastic
@@ -272,16 +272,16 @@ random.shuffle(dataset)
 #=====================================================================#
 
 # EGCN
-model_EGCN_3 = EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_EGCN_5 = EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_EGCN_7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+model_EGCN_3 = EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
+model_EGCN_5 = EGCN_5_copy.Net(mc.dim_atomic_feat, 1, 5).to(device)
+model_EGCN_7 = EGCN_7_copy.Net(mc.dim_atomic_feat, 1, 7).to(device)
 # model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 # model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # Outer_EGCN
-model_Outer_EGCN_3 = Outer_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_Outer_EGCN_5 = Outer_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_Outer_EGCN_7 = Outer_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+model_Outer_EGCN_3 = Outer_EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
+model_Outer_EGCN_5 = Outer_EGCN_5_copy.Net(mc.dim_atomic_feat, 1, 5).to(device)
+model_Outer_EGCN_7 = Outer_EGCN_7_copy.Net(mc.dim_atomic_feat, 1, 7).to(device)
 # model_Outer_EGCN_10 = Outer_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 # model_Outer_EGCN_20 = Outer_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
