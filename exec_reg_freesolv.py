@@ -52,8 +52,8 @@ print(device)
 # experiment parameters
 dataset_name = 'freesolv'
 batch_size = 32
-max_epochs = 1
-k = 2
+max_epochs = 300
+k = 5
 
 
 def collate(samples):
@@ -308,10 +308,10 @@ test_losses = dict()
 
 #------------------------ EGCN ------------------------#
 
-# # feature 3개
-# print('--------- EGCN_3 ---------')
-# test_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_3)
-# print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
+# feature 3개
+print('--------- EGCN_3 ---------')
+test_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_3)
+print('test loss (EGCN_3): ' + str(test_losses['EGCN_3']))
 
 # # feature 5개
 # print('--------- EGCN_5 ---------')
@@ -364,9 +364,9 @@ test_losses = dict()
 
 #------------------------ Self Feature ------------------------#
 
-print('--------- Outer EGCN_elastic ---------')
-test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
-print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
+# print('--------- Outer EGCN_elastic ---------')
+# test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
+# print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
 
 # print('--------- Outer EGCN_elastic ---------')
 # test_losses['Outer_EGCN_elastic'] = trainer_test.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic)
