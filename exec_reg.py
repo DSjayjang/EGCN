@@ -5,6 +5,7 @@ import random
 import numpy as np
 import util.mol_conv as mc
 from model import GCN
+from model import GAT
 from model import EGCN
 from util import trainer
 from util import trainer_test
@@ -34,10 +35,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'esol'
+dataset_name = 'freesolv'
 batch_size = 32
-max_epochs = 1
-k = 2
+max_epochs = 300
+k = 5
 
 
 def collate(samples):
@@ -105,6 +106,7 @@ random.shuffle(dataset)
 # default model
 # don't touch
 model_GCN = GCN.Net(mc.dim_atomic_feat, 1).to(device)
+model_GAT = GAT.Net(mc.dim_atomic_feat, 1, 4).to(device)
 model_EGCN_R = EGCN.Net(mc.dim_atomic_feat, 1, 1).to(device)
 model_EGCN_S = EGCN.Net(mc.dim_atomic_feat, 1, 2).to(device)
 model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
@@ -112,8 +114,8 @@ model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum')
-# criterion = nn.MSELoss(reduction='sum')
+# criterion = nn.L1Loss(reduction='sum')
+criterion = nn.MSELoss(reduction='sum')
 
 # train and evaluate competitors
 test_losses = dict()
@@ -126,6 +128,10 @@ test_losses = dict()
 print('--------- GCN ---------')
 test_losses['GCN'] = trainer.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
 print('test loss (GCN): ' + str(test_losses['GCN']))
+
+print('--------- GAT ---------')
+test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
+print('test loss (GAT): ' + str(test_losses['GAT']))
 
 print('--------- EGCN_RING ---------')
 test_losses['EGCN_R'] = trainer.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_ring)

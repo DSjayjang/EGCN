@@ -85,17 +85,17 @@ class Net(nn.Module):
     def __init__(self, dim_in, dim_out, dim_self_feat):
         super(Net, self).__init__()
 
-        self.gc1 = GCNLayer(dim_in, 100)
-        self.gc2 = GCNLayer(100, 20)
+        self.gc1 = GCNLayer(dim_in, 32)
+        self.gc2 = GCNLayer(32, 16)
 
-        self.fc1 = nn.Linear(20 * dim_self_feat, 128)
-        self.fc2 = nn.Linear(128, 32)
-        self.fc3 = nn.Linear(32, dim_out)
+        self.fc1 = nn.Linear(16 * dim_self_feat, 64)
+        self.fc2 = nn.Linear(64, 16)
+        self.fc3 = nn.Linear(16, dim_out)
 
-        self.bn1 = nn.BatchNorm1d(128)
-        self.bn2 = nn.BatchNorm1d(32)
+        self.bn1 = nn.BatchNorm1d(64)
+        self.bn2 = nn.BatchNorm1d(16)
         self.bn3 = nn.BatchNorm1d(8)
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.5)
 
 
     def forward(self, g, self_feat):

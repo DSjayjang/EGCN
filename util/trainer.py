@@ -4,7 +4,6 @@ import numpy as np
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-
 def train(model, criterion, optimizer, train_data_loader, max_epochs):
     model.train()
 
@@ -104,7 +103,6 @@ def test_emodel(model, criterion, test_data_loader, accs=None):
                 correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
 
         test_loss /= len(test_data_loader.dataset)
-
         print('Test loss: ' + str(test_loss))
 
     if accs is not None:
