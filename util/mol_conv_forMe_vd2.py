@@ -19,7 +19,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 20
+dim_self_feat = 9
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -121,32 +121,15 @@ def read_dataset(file_name):
             ####################################################
             # 1
             mol_graph.MolWt = dsc.MolWt(mol)
-            mol_graph.fr_alkyl_halide = dsc.fr_alkyl_halide(mol)
-            mol_graph.NumRotatableBonds = dsc.NumRotatableBonds(mol)
-            mol_graph.FpDensityMorgan1 = dsc.FpDensityMorgan1(mol)
-            mol_graph.HeavyAtomMolWt = dsc.HeavyAtomMolWt(mol)
-            # 6
-            mol_graph.EState_VSA9 = dsc.EState_VSA9(mol)
-            mol_graph.BCUT2D_LOGPHI = dsc.BCUT2D_LOGPHI(mol)
-            mol_graph.MinAbsEStateIndex = dsc.MinAbsEStateIndex(mol)
-            mol_graph.VSA_EState7 = dsc.VSA_EState7(mol)
-            mol_graph.fr_allylic_oxid = dsc.fr_allylic_oxid(mol)
-            # 11
-            mol_graph.Chi3v = dsc.Chi3v(mol)
-            mol_graph.PEOE_VSA8 = dsc.PEOE_VSA8(mol)
-            mol_graph.VSA_EState10 = dsc.VSA_EState10(mol)
-            mol_graph.MaxAbsPartialCharge = dsc.MaxAbsPartialCharge(mol)
-            mol_graph.PEOE_VSA4 = dsc.PEOE_VSA4(mol)
-            # 16
-            mol_graph.SlogP_VSA1 = dsc.SlogP_VSA1(mol)
-            mol_graph.fr_nitrile = dsc.fr_nitrile(mol)
-            mol_graph.Chi4v = dsc.Chi4v(mol)
-            mol_graph.MinPartialCharge = dsc.MinPartialCharge(mol)
-            mol_graph.PEOE_VSA13 = dsc.PEOE_VSA13(mol)
-            # 21
-            mol_graph.fr_nitro = dsc.fr_nitro(mol)
-            mol_graph.fr_ketone_Topliss = dsc.fr_ketone_Topliss(mol)
             mol_graph.ExactMolWt = dsc.ExactMolWt(mol)
+            mol_graph.HeavyAtomMolWt = dsc.HeavyAtomMolWt(mol)
+            mol_graph.MolMR = dsc.MolMR(mol)
+            mol_graph.Chi1v = dsc.Chi1v(mol)
+            # 6
+            mol_graph.Chi0v = dsc.Chi0v(mol)
+            mol_graph.Chi4v = dsc.Chi4v(mol)
+            mol_graph.NumRotatableBonds = dsc.NumRotatableBonds(mol)
+            mol_graph.fr_allylic_oxid = dsc.fr_allylic_oxid(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
@@ -155,32 +138,15 @@ def read_dataset(file_name):
     ####################################################
     # 1
     normalize_self_feat(mol_graphs, 'MolWt')
-    normalize_self_feat(mol_graphs, 'fr_alkyl_halide')
-    normalize_self_feat(mol_graphs, 'NumRotatableBonds')
-    normalize_self_feat(mol_graphs, 'FpDensityMorgan1')
-    normalize_self_feat(mol_graphs, 'HeavyAtomMolWt')
-    # 6
-    normalize_self_feat(mol_graphs, 'EState_VSA9')
-    normalize_self_feat(mol_graphs, 'BCUT2D_LOGPHI')
-    normalize_self_feat(mol_graphs, 'MinAbsEStateIndex')
-    normalize_self_feat(mol_graphs, 'VSA_EState7')
-    normalize_self_feat(mol_graphs, 'fr_allylic_oxid')
-    # 11
-    normalize_self_feat(mol_graphs, 'Chi3v')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA8')
-    normalize_self_feat(mol_graphs, 'VSA_EState10')
-    normalize_self_feat(mol_graphs, 'MaxAbsPartialCharge')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA4')
-    # 16
-    normalize_self_feat(mol_graphs, 'SlogP_VSA1')
-    normalize_self_feat(mol_graphs, 'fr_nitrile')
-    normalize_self_feat(mol_graphs, 'Chi4v')
-    normalize_self_feat(mol_graphs, 'MinPartialCharge')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA13')
-    # 21
-    normalize_self_feat(mol_graphs, 'fr_nitro')
-    normalize_self_feat(mol_graphs, 'fr_ketone_Topliss')
     normalize_self_feat(mol_graphs, 'ExactMolWt')
+    normalize_self_feat(mol_graphs, 'HeavyAtomMolWt')
+    normalize_self_feat(mol_graphs, 'MolMR')
+    normalize_self_feat(mol_graphs, 'Chi1v')
+    # 6
+    normalize_self_feat(mol_graphs, 'Chi0v')
+    normalize_self_feat(mol_graphs, 'Chi4v')
+    normalize_self_feat(mol_graphs, 'NumRotatableBonds')
+    normalize_self_feat(mol_graphs, 'fr_allylic_oxid')
 
     return samples
 

@@ -3,7 +3,7 @@ import torch.nn as nn
 import dgl
 import random
 import numpy as np
-import util.mol_conv_forMe_vd as mc
+import util.mol_conv_forMe_vd2 as mc
 
 from model import EGCN_1_copy
 
@@ -19,7 +19,7 @@ from model import Outer_EGCN_5_copy
 from model import Outer_EGCN_7_copy
 from model import Outer_EGCN_10_copy
 from model import Outer_EGCN_20_copy
-from model import Outer_EGCN_elastic_copy
+from model import Outer_EGCN_elastic_copy2
 
 from util import trainer
 from util import trainer_test
@@ -54,8 +54,8 @@ print(device)
 # experiment parameters
 dataset_name = 'molproperty_vd'
 batch_size = 32
-max_epochs = 500
-k = 5
+max_epochs = 300
+k = 2
 
 
 def collate(samples):
@@ -96,8 +96,8 @@ def collate_emodel_elastic_3(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.MolWt
-        self_feats[i, 1] = mol_graph.fr_alkyl_halide
-        self_feats[i, 2] = mol_graph.NumRotatableBonds
+        self_feats[i, 1] = mol_graph.ExactMolWt
+        self_feats[i, 2] = mol_graph.HeavyAtomMolWt
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -115,10 +115,10 @@ def collate_emodel_elastic_5(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.MolWt
-        self_feats[i, 1] = mol_graph.fr_alkyl_halide
-        self_feats[i, 2] = mol_graph.NumRotatableBonds
-        self_feats[i, 3] = mol_graph.FpDensityMorgan1
-        self_feats[i, 4] = mol_graph.HeavyAtomMolWt
+        self_feats[i, 1] = mol_graph.ExactMolWt
+        self_feats[i, 2] = mol_graph.HeavyAtomMolWt
+        self_feats[i, 3] = mol_graph.MolMR
+        self_feats[i, 4] = mol_graph.Chi1v
         ####################################################
     graphs, labels = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
@@ -135,13 +135,13 @@ def collate_emodel_elastic_7(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.MolWt
-        self_feats[i, 1] = mol_graph.fr_alkyl_halide
-        self_feats[i, 2] = mol_graph.NumRotatableBonds
-        self_feats[i, 3] = mol_graph.FpDensityMorgan1
-        self_feats[i, 4] = mol_graph.HeavyAtomMolWt
+        self_feats[i, 1] = mol_graph.ExactMolWt
+        self_feats[i, 2] = mol_graph.HeavyAtomMolWt
+        self_feats[i, 3] = mol_graph.MolMR
+        self_feats[i, 4] = mol_graph.Chi1v
         # 6
-        self_feats[i, 5] = mol_graph.EState_VSA9
-        # self_feats[i, 6] = mol_graph.BCUT2D_LOGPHI
+        self_feats[i, 5] = mol_graph.Chi0v
+        self_feats[i, 6] = mol_graph.Chi4v
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -150,31 +150,31 @@ def collate_emodel_elastic_7(samples):
     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
 
 
-def collate_emodel_elastic_10(samples):
-    self_feats = np.empty((len(samples), 10), dtype=np.float32)
+# def collate_emodel_elastic_10(samples):
+#     self_feats = np.empty((len(samples), 10), dtype=np.float32)
 
-    for i in range(0, len(samples)):
-        mol_graph = samples[i][0]
+#     for i in range(0, len(samples)):
+#         mol_graph = samples[i][0]
 
-        ####################################################
-        # 1
-        self_feats[i, 0] = mol_graph.MolWt
-        self_feats[i, 1] = mol_graph.fr_alkyl_halide
-        self_feats[i, 2] = mol_graph.NumRotatableBonds
-        self_feats[i, 3] = mol_graph.FpDensityMorgan1
-        self_feats[i, 4] = mol_graph.HeavyAtomMolWt
-        # 6
-        self_feats[i, 5] = mol_graph.EState_VSA9
-        self_feats[i, 6] = mol_graph.BCUT2D_LOGPHI
-        self_feats[i, 7] = mol_graph.MinAbsEStateIndex
-        self_feats[i, 8] = mol_graph.VSA_EState7
-        self_feats[i, 9] = mol_graph.fr_allylic_oxid
-        ####################################################
+#         ####################################################
+#         # 1
+#         self_feats[i, 0] = mol_graph.MolWt
+#         self_feats[i, 1] = mol_graph.fr_alkyl_halide
+#         self_feats[i, 2] = mol_graph.NumRotatableBonds
+#         self_feats[i, 3] = mol_graph.FpDensityMorgan1
+#         self_feats[i, 4] = mol_graph.HeavyAtomMolWt
+#         # 6
+#         self_feats[i, 5] = mol_graph.EState_VSA9
+#         self_feats[i, 6] = mol_graph.BCUT2D_LOGPHI
+#         self_feats[i, 7] = mol_graph.MinAbsEStateIndex
+#         self_feats[i, 8] = mol_graph.VSA_EState7
+#         self_feats[i, 9] = mol_graph.fr_allylic_oxid
+#         ####################################################
 
-    graphs, labels = map(list, zip(*samples))
-    batched_graph = dgl.batch(graphs)
+#     graphs, labels = map(list, zip(*samples))
+#     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+#     return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
 
 
 # def collate_emodel_elastic_20(samples):
@@ -226,33 +226,15 @@ def collate_emodel_elastic(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.MolWt
-        self_feats[i, 1] = mol_graph.fr_alkyl_halide
-        self_feats[i, 2] = mol_graph.NumRotatableBonds
-        self_feats[i, 3] = mol_graph.FpDensityMorgan1
-        self_feats[i, 4] = mol_graph.HeavyAtomMolWt
+        self_feats[i, 1] = mol_graph.ExactMolWt
+        self_feats[i, 2] = mol_graph.HeavyAtomMolWt
+        self_feats[i, 3] = mol_graph.MolMR
+        self_feats[i, 4] = mol_graph.Chi1v
         # 6
-        self_feats[i, 5] = mol_graph.EState_VSA9
-        # self_feats[i, 6] = mol_graph.BCUT2D_LOGPHI
-        self_feats[i, 6] = mol_graph.MinAbsEStateIndex
-        self_feats[i, 7] = mol_graph.VSA_EState7
+        self_feats[i, 5] = mol_graph.Chi0v
+        self_feats[i, 6] = mol_graph.Chi4v
+        self_feats[i, 7] = mol_graph.NumRotatableBonds
         self_feats[i, 8] = mol_graph.fr_allylic_oxid
-        self_feats[i, 9] = mol_graph.Chi3v
-        # 11
-        self_feats[i, 10] = mol_graph.PEOE_VSA8
-        self_feats[i, 11] = mol_graph.VSA_EState10
-        # self_feats[i, 12] = mol_graph.MaxAbsPartialCharge
-        self_feats[i, 12] = mol_graph.PEOE_VSA4
-        self_feats[i, 13] = mol_graph.SlogP_VSA1
-        # 16
-        self_feats[i, 14] = mol_graph.fr_nitrile
-        self_feats[i, 15] = mol_graph.Chi4v
-        # self_feats[i, 17] = mol_graph.MinPartialCharge
-        self_feats[i, 16] = mol_graph.PEOE_VSA13
-        self_feats[i, 17] = mol_graph.fr_nitro
-        # 21
-        self_feats[i, 18] = mol_graph.fr_ketone_Topliss
-        self_feats[i, 19] = mol_graph.ExactMolWt
-        # self_feats[i, 22] = mol_graph.
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -274,23 +256,23 @@ train_dataset, test_dataset = train_test_split(dataset, test_size = 0.2, random_
 #=====================================================================#
 
 # # EGCN
-model_EGCN_1 = EGCN_1_copy.Net(mc.dim_atomic_feat, 1, 1).to(device)
+# model_EGCN_1 = EGCN_1_copy.Net(mc.dim_atomic_feat, 1, 1).to(device)
 
-model_EGCN_3 = EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_EGCN_5 = EGCN_5_copy.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_EGCN_7 = EGCN_7_copy.Net(mc.dim_atomic_feat, 1, 6).to(device)
-model_EGCN_10 = EGCN_10_copy.Net(mc.dim_atomic_feat, 1, 10).to(device)
-model_EGCN_20 = Outer_EGCN_elastic_copy.Net(mc.dim_atomic_feat, 1, 20).to(device)
+# model_EGCN_3 = EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
+# model_EGCN_5 = EGCN_5_copy.Net(mc.dim_atomic_feat, 1, 5).to(device)
+# model_EGCN_7 = EGCN_7_copy.Net(mc.dim_atomic_feat, 1, 6).to(device)
+# model_EGCN_10 = EGCN_10_copy.Net(mc.dim_atomic_feat, 1, 10).to(device)
+# model_EGCN_20 = Outer_EGCN_elastic_copy.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
-# Outer_EGCN
-model_Outer_EGCN_3 = Outer_EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_Outer_EGCN_5 = Outer_EGCN_5_copy.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_Outer_EGCN_7 = Outer_EGCN_7_copy.Net(mc.dim_atomic_feat, 1, 7).to(device)
-model_Outer_EGCN_10 = Outer_EGCN_10_copy.Net(mc.dim_atomic_feat, 1, 10).to(device)
-model_Outer_EGCN_20 = Outer_EGCN_20_copy.Net(mc.dim_atomic_feat, 1, 20).to(device)
+# # Outer_EGCN
+# model_Outer_EGCN_3 = Outer_EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
+# model_Outer_EGCN_5 = Outer_EGCN_5_copy.Net(mc.dim_atomic_feat, 1, 5).to(device)
+# model_Outer_EGCN_7 = Outer_EGCN_7_copy.Net(mc.dim_atomic_feat, 1, 7).to(device)
+# model_Outer_EGCN_10 = Outer_EGCN_10_copy.Net(mc.dim_atomic_feat, 1, 10).to(device)
+# model_Outer_EGCN_20 = Outer_EGCN_20_copy.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # Self_Feature
-model_Outer_EGCN_elastic = Outer_EGCN_elastic_copy.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
+model_Outer_EGCN_elastic = Outer_EGCN_elastic_copy2.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 
 
 #=====================================================================#
@@ -356,10 +338,6 @@ test_losses = dict()
 # test_losses['Outer_EGCN_3'] = trainer.cross_validation(dataset, model_Outer_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_3)
 # print('test loss (Outer_EGCN_3): ' + str(test_losses['Outer_EGCN_3']))
 
-print('--------- Outer EGCN_3 ---------')
-test_losses['Outer_EGCN_3'], best_model, best_k = trainer_test.cross_validation(train_dataset, model_Outer_EGCN_3, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic_3)
-print('test loss (Outer_EGCN_3): ' + str(test_losses['Outer_EGCN_3']))
-
 # # feature 5개
 # print('--------- Outer EGCN_5 ---------')
 # test_losses['Outer_EGCN_5'] = trainer.cross_validation(dataset, model_Outer_EGCN_5, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_5)
@@ -387,9 +365,9 @@ print('test loss (Outer_EGCN_3): ' + str(test_losses['Outer_EGCN_3']))
 # test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
 # print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
 
-# print('--------- Outer EGCN_elastic ---------')
-# test_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic)
-# print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
+print('--------- Outer EGCN_elastic ---------')
+test_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic)
+print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
 
 print(test_losses)
 

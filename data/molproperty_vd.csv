@@ -1,4 +1,4 @@
-﻿smiles,vapor density_v1
+﻿smiles,vapor density
 C=O,1.04
 CNN,1.6
 C(=O)O,1.6
@@ -25,11 +25,12 @@ C1=CC=C(C=C1)O,3.24
 CCCCN,2.52
 CCN(CC)CC,3.49
 CCOC(=O)C,3.04
+[C-]#N.[Na+],1.7
 C1CN1,1.48
 CC1=C(C=C(C=C1)N=C=O)N=C=O,6
 C=CC(=O)Cl,3.63
 CCC(C)(OO)OOC(C)(CC)OO,2
-FH,0.7
+F,0.7
 OS(=O)(=O)O,3.4
 [N+](=O)(O)[O-],2.2
 P(Cl)(Cl)Cl,4.75
