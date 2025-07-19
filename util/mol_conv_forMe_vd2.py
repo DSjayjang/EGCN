@@ -19,7 +19,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 9
+dim_self_feat = 2
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -120,16 +120,8 @@ def read_dataset(file_name):
         if mol is not None and mol_graph is not None:
             ####################################################
             # 1
-            mol_graph.MolWt = dsc.MolWt(mol)
-            mol_graph.ExactMolWt = dsc.ExactMolWt(mol)
             mol_graph.HeavyAtomMolWt = dsc.HeavyAtomMolWt(mol)
-            mol_graph.MolMR = dsc.MolMR(mol)
-            mol_graph.Chi1v = dsc.Chi1v(mol)
-            # 6
-            mol_graph.Chi0v = dsc.Chi0v(mol)
-            mol_graph.Chi4v = dsc.Chi4v(mol)
-            mol_graph.NumRotatableBonds = dsc.NumRotatableBonds(mol)
-            mol_graph.fr_allylic_oxid = dsc.fr_allylic_oxid(mol)
+            mol_graph.PEOE_VSA3 = dsc.PEOE_VSA3(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
@@ -137,16 +129,8 @@ def read_dataset(file_name):
 
     ####################################################
     # 1
-    normalize_self_feat(mol_graphs, 'MolWt')
-    normalize_self_feat(mol_graphs, 'ExactMolWt')
     normalize_self_feat(mol_graphs, 'HeavyAtomMolWt')
-    normalize_self_feat(mol_graphs, 'MolMR')
-    normalize_self_feat(mol_graphs, 'Chi1v')
-    # 6
-    normalize_self_feat(mol_graphs, 'Chi0v')
-    normalize_self_feat(mol_graphs, 'Chi4v')
-    normalize_self_feat(mol_graphs, 'NumRotatableBonds')
-    normalize_self_feat(mol_graphs, 'fr_allylic_oxid')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA3')
 
     return samples
 

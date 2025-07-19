@@ -88,14 +88,15 @@ class Net(nn.Module):
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
 
-        self.fc1 = nn.Linear(20 * dim_self_feat, 64)
-        self.fc2 = nn.Linear(64, 16)
-        self.fc3 = nn.Linear(16, dim_out)
+        self.fc1 = nn.Linear(20 * dim_self_feat, 16)
+        self.fc2 = nn.Linear(16, 4)
+        self.fc3 = nn.Linear(4, dim_out)
+        # self.fc3 = nn.Linear(16, dim_out)
 
-        self.bn1 = nn.BatchNorm1d(64)
-        self.bn2 = nn.BatchNorm1d(16)
+        self.bn1 = nn.BatchNorm1d(16)
+        self.bn2 = nn.BatchNorm1d(4)
         self.bn3 = nn.BatchNorm1d(8)
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.5)
 
 
     def forward(self, g, self_feat):
@@ -120,5 +121,7 @@ class Net(nn.Module):
         out = F.relu(self.bn2(self.fc2(out)))
 
         out = self.fc3(out)
+
+        # out = self.fc3(out)
 
         return out
