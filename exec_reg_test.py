@@ -39,7 +39,7 @@ print(device)
 # experiment parameters
 dataset_name = 'freesolv'
 batch_size = 32
-max_epochs = 300
+max_epochs = 1
 k = 5
 
 

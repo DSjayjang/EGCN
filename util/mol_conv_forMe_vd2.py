@@ -19,7 +19,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 2
+dim_self_feat = 3
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -120,8 +120,9 @@ def read_dataset(file_name):
         if mol is not None and mol_graph is not None:
             ####################################################
             # 1
-            mol_graph.HeavyAtomMolWt = dsc.HeavyAtomMolWt(mol)
-            mol_graph.PEOE_VSA3 = dsc.PEOE_VSA3(mol)
+            mol_graph.NumHDonors = dsc.NumHDonors(mol)
+            mol_graph.NOCount = dsc.NOCount(mol)
+            mol_graph.TPSA = dsc.TPSA(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
@@ -129,8 +130,9 @@ def read_dataset(file_name):
 
     ####################################################
     # 1
-    normalize_self_feat(mol_graphs, 'HeavyAtomMolWt')
-    normalize_self_feat(mol_graphs, 'PEOE_VSA3')
+    normalize_self_feat(mol_graphs, 'NumHDonors')
+    normalize_self_feat(mol_graphs, 'NOCount')
+    normalize_self_feat(mol_graphs, 'TPSA')
 
     return samples
 

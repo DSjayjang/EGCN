@@ -6,64 +6,22 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import pandas as pd
 
+    # preds = preds.detach().cpu().numpy()
+    # targets = targets.cpu().numpy()
+    # self_feats = self_feats.cpu().numpy()
+    # np.savetxt(f'result_train.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
 
-def train(model, criterion, optimizer, train_data_loader, max_epochs):
-    model.train()
+            # if preds is None:
+            #     preds = pred.clone().detach()
+            #     targets = target.clone().detach()
+            #     self_feats = self_feat.clone().detach()
+            # else:
+            #     preds = torch.cat((preds, pred), dim=0)
+            #     targets = torch.cat((targets, target), dim=0)
+            #     self_feats = torch.cat((self_feats, self_feat), dim=0)
 
-    for epoch in range(0, max_epochs):
-        train_loss = 0
 
-        for bg, target in train_data_loader:
-            pred = model(bg)
-            loss = criterion(pred, target)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            train_loss += loss.detach().item()
-
-        train_loss /= len(train_data_loader.dataset)
-
-        print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
-
-# # train val loss 그리기
-# def train_emodel(model, criterion, optimizer, train_data_loader, max_epochs, valid_data_loader):
-#     train_losses = [] # Train loss 저장
-#     valid_losses = [] # Vaild loss 저장
-
-#     for epoch in range(0, max_epochs):
-#         model.train()
-#         train_loss = 0
-
-#         for bg, self_feat, target in train_data_loader:
-#             pred = model(bg, self_feat)
-#             loss = criterion(pred, target)
-#             optimizer.zero_grad()
-#             loss.backward()
-#             optimizer.step()
-#             train_loss += loss.detach().item()
-
-#         train_loss /= len(train_data_loader.dataset)
-#         train_losses.append(train_loss)  # Save loss for this epoch
-
-#         print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
-
-#         model.train()
-#         valid_loss = 0
-
-#         with torch.no_grad():
-#             for bg, self_feat, target in valid_data_loader:
-#                 pred = model(bg, self_feat)
-#                 loss = criterion(pred, target)
-#                 valid_loss += loss.detach().item()
-
-#             valid_loss /= len(valid_data_loader.dataset)
-#             valid_losses.append(valid_loss)  # Save loss for this epoch
-
-#             print('Epoch {}, train loss {:.4f}'.format(epoch + 1, valid_loss))
-
-#     return train_losses, valid_losses  # Epoch별 train loss, valid loss 반환 
-
-def train_emodel(model, criterion, optimizer, train_data_loader, max_epochs):
+def train_model(model, criterion, optimizer, train_data_loader, max_epochs):
     # preds = None # pred 저장
     # targets = None
     # self_feats = None
@@ -82,61 +40,16 @@ def train_emodel(model, criterion, optimizer, train_data_loader, max_epochs):
             optimizer.step()
             train_loss += loss.detach().item()
 
-            # if preds is None:
-            #     preds = pred.clone().detach()
-            #     targets = target.clone().detach()
-            #     self_feats = self_feat.clone().detach()
-            # else:
-            #     preds = torch.cat((preds, pred), dim=0)
-            #     targets = torch.cat((targets, target), dim=0)
-            #     self_feats = torch.cat((self_feats, self_feat), dim=0)
-
         train_loss /= len(train_data_loader.dataset)
         train_losses.append(train_loss)  # Save loss for this epoch
 
         print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
 
-    # preds = preds.detach().cpu().numpy()
-    # targets = targets.cpu().numpy()
-    # self_feats = self_feats.cpu().numpy()
-    # np.savetxt(f'result_train.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
-
     return train_losses  # Epoch별 train loss, valid loss 반환 
 
 
-def test(model, criterion, test_data_loader, accs=None):
-    preds = None
-    model.eval()
-
-    with torch.no_grad():
-        test_loss = 0
-        correct = 0
-
-        for bg, target in test_data_loader:
-            pred = model(bg)
-            loss = criterion(pred, target)
-            test_loss += loss.detach().item()
-
-            if preds is None:
-                preds = pred.clone().detach()
-            else:
-                preds = torch.cat((preds, pred), dim=0)
-
-            if accs is not None:
-                correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
-
-        test_loss /= len(test_data_loader.dataset)
-
-        print('Test loss: ' + str(test_loss))
-
-    if accs is not None:
-        accs.append(correct / len(test_data_loader.dataset) * 100)
-        print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
-    
-    return test_loss, preds
-
-
-def test_emodel(model, criterion, test_data_loader, k, accs=None):
+# def val_model(model, criterion, val_data_loader, k, accs=None):
+def val_model(model, criterion, val_data_loader, k):
     preds = None
     model.eval()
 
@@ -144,13 +57,13 @@ def test_emodel(model, criterion, test_data_loader, k, accs=None):
     self_feats = None
 
     with torch.no_grad():
-        test_loss = 0
+        val_loss = 0
         correct = 0
 
-        for bg, self_feat, target in test_data_loader:
+        for bg, self_feat, target in val_data_loader:
             pred = model(bg, self_feat)
             loss = criterion(pred, target)
-            test_loss += loss.detach().item()
+            val_loss += loss.detach().item()
 
             if preds is None:
                 preds = pred.clone().detach()
@@ -161,32 +74,33 @@ def test_emodel(model, criterion, test_data_loader, k, accs=None):
                 targets = torch.cat((targets, target), dim=0)
                 self_feats = torch.cat((self_feats, self_feat), dim=0)
 
-            if accs is not None:
-                correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+            # if accs is not None:
+            #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
 
-        test_loss /= len(test_data_loader.dataset)
+        val_loss /= len(val_data_loader.dataset)
 
-        print('Test loss: ' + str(test_loss))
+        print('Val loss: ' + str(val_loss))
 
-    if accs is not None:
-        accs.append(correct / len(test_data_loader.dataset) * 100)
-        print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+    # if accs is not None:
+    #     accs.append(correct / len(val_data_loader.dataset) * 100)
+    #     print('Test accuracy: ' + str((correct / len(val_data_loader.dataset) * 100)) + '%')
 
     preds = preds.cpu().numpy()
     targets = targets.cpu().numpy()
     self_feats = self_feats.cpu().numpy()
     np.savetxt(f'result_val_{k}.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
 
-    return test_loss, preds
+    return val_loss, preds
 
 
-def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epochs, train, test, collate, accs=None):
+# def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epochs, train, val, collate, accs=None):
+def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epochs, train, val, collate):
     num_data_points = len(dataset)
     size_fold = int(len(dataset) / float(num_folds))
     folds = []
     models = []
     optimizers = []
-    test_losses = []
+    val_losses = []
 
     # best model
     best_model = None
@@ -210,7 +124,7 @@ def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epoch
         print('--------------- fold {} ---------------'.format(k + 1))
 
         train_dataset = []
-        test_dataset = folds[k]
+        val_dataset = folds[k]
 
         for i in range(0, num_folds):
             if i != k:
@@ -218,22 +132,21 @@ def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epoch
 
 
         train_data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate)
-        test_data_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate)
+        val_data_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate)
 
 
         # Train the model for this fold
         train_losses = train(models[k], criterion, optimizers[k], train_data_loader, max_epochs)
         fold_train_losses.append(train_losses)
 
-
-
-        # Test the model for this fold
-        test_loss, pred = test(models[k], criterion, test_data_loader, k, accs)
-        test_losses.append(test_loss)
+        # Validate the model for this fold
+        # val_loss, pred = val(models[k], criterion, val_data_loader, k, accs)
+        val_loss, pred = val(models[k], criterion, val_data_loader, k)
+        val_losses.append(val_loss)
 
         # best model 저장 (validation loss 기준으로)
-        if test_loss < best_loss:
-            best_loss = test_loss
+        if val_loss < best_loss:
+            best_loss = val_loss
             best_model = copy.deepcopy(models[k])
             best_k = k
     print(f'Best Validation Loss: {best_loss}')
@@ -257,14 +170,14 @@ def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epoch
     Loss_df = pd.DataFrame({'Fold': list(range(1, len(fold_train_losses) + 1)), 'Train Loss': fold_train_losses})
     Loss_df.to_csv('Loss.csv', index = False)
 
-    if accs is None:
-        return np.mean(test_losses), best_model, best_k
-    else:
-        return np.mean(test_losses), np.mean(accs), best_model, best_k
+    return np.mean(val_losses), best_model, best_k
+    # else:
+    #     return np.mean(val_losses), np.mean(accs), best_model, best_k
     
 
 # 최종 test용
-def final_test_emodel(model, criterion, test_data_loader, accs=None):
+# def final_test_emodel(model, criterion, test_data_loader, accs=None):
+def test_model(model, criterion, test_data_loader):
     preds = None
     model.eval()
 
@@ -289,16 +202,16 @@ def final_test_emodel(model, criterion, test_data_loader, accs=None):
                 targets = torch.cat((targets, target), dim=0)
                 self_feats = torch.cat((self_feats, self_feat), dim=0)
 
-            if accs is not None:
-                correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+            # if accs is not None:
+            #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
 
         test_loss /= len(test_data_loader.dataset)
 
-        print('Test loss: ' + str(test_loss))
+        # print('Test loss: ' + str(test_loss))
 
-    if accs is not None:
-        accs.append(correct / len(test_data_loader.dataset) * 100)
-        print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+    # if accs is not None:
+    #     accs.append(correct / len(test_data_loader.dataset) * 100)
+    #     print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
 
     preds = preds.cpu().numpy()
     targets = targets.cpu().numpy()

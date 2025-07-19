@@ -42,10 +42,10 @@ class Net(nn.Module):
     def __init__(self, dim_in, dim_out, dim_self_feat):
         super(Net, self).__init__()
 
-        self.gc1 = GCNLayer(dim_in, 32)
-        self.gc2 = GCNLayer(32, 16)
+        self.gc1 = GCNLayer(dim_in, 100)
+        self.gc2 = GCNLayer(100, 20)
 
-        self.fc1 = nn.Linear(16 + dim_self_feat, 10)
+        self.fc1 = nn.Linear(20 + dim_self_feat, 10)
         self.fc2 = nn.Linear(10, dim_out)
 
 
