@@ -54,8 +54,12 @@ def read_atom_prop():
 def construct_mol_graph(smiles, mol, adj_mat, feat_mat):
     molGraph = molDGLGraph(smiles, adj_mat, feat_mat, mol).to(device)
     edges = util.adj_mat_to_edges(adj_mat)
-    src, dst = tuple(zip(*edges))
 
+    if edges:
+        src, dst = tuple(zip(*edges))
+    else:
+        src, dst = [], []
+        
     molGraph.add_nodes(adj_mat.shape[0])
     molGraph.add_edges(src, dst)
     molGraph.ndata['feat'] = torch.tensor(feat_mat, dtype=torch.float32).to(device)
@@ -119,6 +123,9 @@ def read_dataset(file_name):
 
         if mol is not None and mol_graph is not None:
             ####################################################
+            # # 1
+            # mol_graph.MolWt = dsc.MolWt(mol)
+            # mol_graph.HeavyAtomMolWt = dsc.HeavyAtomMolWt(mol)
             # 1
             mol_graph.NumHDonors = dsc.NumHDonors(mol)
             mol_graph.NOCount = dsc.NOCount(mol)
@@ -129,7 +136,9 @@ def read_dataset(file_name):
             mol_graphs.append(mol_graph)
 
     ####################################################
-    # 1
+    # # 1
+    # normalize_self_feat(mol_graphs, 'MolWt')
+    # normalize_self_feat(mol_graphs, 'HeavyAtomMolWt')
     normalize_self_feat(mol_graphs, 'NumHDonors')
     normalize_self_feat(mol_graphs, 'NOCount')
     normalize_self_feat(mol_graphs, 'TPSA')

@@ -46,12 +46,13 @@ class Net(nn.Module):
         self.gc2 = GCNLayer(100, 20)
 
         self.fc1 = nn.Linear(20 * dim_self_feat, 32)
-        self.fc2 = nn.Linear(32, dim_out)
+        self.fc2 = nn.Linear(32, 8)
+        self.fc3 = nn.Linear(8, dim_out)
         # self.fc3 = nn.Linear(8, dim_out)
 
         self.bn1 = nn.BatchNorm1d(32)
         self.bn2 = nn.BatchNorm1d(8)
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.2)
 
     def forward(self, g, self_feat):
         h = F.relu(self.gc1(g, g.ndata['feat']))
@@ -67,8 +68,8 @@ class Net(nn.Module):
 
         out = F.relu(self.bn1(self.fc1(hg)))
         out = self.dropout(out)
-        # out = F.relu(self.bn2(self.fc2(out)))
-
-        out = self.fc2(out)
+        out = F.relu(self.bn2(self.fc2(out)))
+        
+        out = self.fc3(out)
 
         return out

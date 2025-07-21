@@ -96,9 +96,9 @@ def collate_emodel_elastic_3(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.NumHDonors
-        self_feats[i, 1] = mol_graph.NOCount
-        self_feats[i, 2] = mol_graph.TPSA
+        self_feats[i, 0] = mol_graph.MolLogP
+        self_feats[i, 1] = mol_graph.MolMR
+        self_feats[i, 2] = mol_graph.PEOE_VSA6
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -225,6 +225,9 @@ def collate_emodel_elastic(samples):
         mol_graph = samples[i][0]
 
         ####################################################
+        # # 1
+        # self_feats[i, 0] = mol_graph.MolWt
+        # self_feats[i, 1] = mol_graph.HeavyAtomMolWt
         # 1
         self_feats[i, 0] = mol_graph.NumHDonors
         self_feats[i, 1] = mol_graph.NOCount
@@ -268,7 +271,8 @@ model_Outer_EGCN_3 = Outer_EGCN_3_copy.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 # Self_Feature
 # model_EGCN_elastic = EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
-model_Outer_EGCN_elastic = Outer_EGCN_3_copy.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
+# model_EGCN_elastic = EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
+model_Outer_EGCN_elastic = Outer_EGCN_elastic_copy2.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 
 
 #=====================================================================#
@@ -279,9 +283,8 @@ model_Outer_EGCN_elastic = Outer_EGCN_3_copy.Net(mc.dim_atomic_feat, 1, mc.dim_s
 
 
 # define loss function
-# criterion = nn.L1Loss(reduction='sum') # MAE
-# criterion = nn.MSELoss() # MSE
-criterion = nn.MSELoss(reduction='sum') # MSE
+criterion = nn.L1Loss(reduction='sum') # MAE
+# criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
 val_losses = dict()
@@ -357,29 +360,36 @@ test_losses = dict()
 
 #------------------------ Self Feature ------------------------#
 
+
+# print('--------- EGCN_3 ---------')
+# val_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_3)
+# print('Val loss (EGCN_3): ' + str(val_losses['EGCN_3']))
+
 # print('--------- EGCN_elastic ---------')
-# test_losses['EGCN_elastic'] = trainer.cross_validation(dataset, model_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
-# print('test loss (EGCN_elastic): ' + str(test_losses['EGCN_elastic']))
+# val_losses['EGCN_elastic'] = trainer.cross_validation(dataset, model_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
+# print('Val loss (EGCN_elastic): ' + str(val_losses['EGCN_elastic']))
 
 # print('--------- Outer EGCN_elastic ---------')
-# test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
-# print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
+# val_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
+# print('Val loss (Outer_EGCN_elastic): ' + str(val_losses['Outer_EGCN_elastic']))
 
-print('--------- EGCN_3 ---------')
-val_losses['EGCN_3'] = trainer.cross_validation(dataset, model_EGCN_3, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_3)
-print('Val loss (EGCN_3): ' + str(val_losses['EGCN_3']))
 
+
+
+
+
+
+
+# 최종 평가
 print('--------- Outer EGCN_elastic ---------')
 val_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_model, trainer_test.val_model, collate_emodel_elastic)
 print('Val loss (Outer_EGCN_elastic): ' + str(val_losses['Outer_EGCN_elastic']))
 
-
-# 최종 평가
 test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel_elastic)
 test_loss, final_preds = trainer_test.test_model(best_model, criterion, test_data_loader)
-
+print('best_k-fold:', best_k)
 print(val_losses)
-print(f'Test Loss: {test_loss}')
+# print(f'Test Loss: {test_loss}')
 # #=====================================================================#
 # #=========================== Embedding : 2 ===========================#
 # #=====================================================================#
