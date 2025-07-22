@@ -19,7 +19,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 2
+dim_self_feat = 25
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -59,7 +59,6 @@ def construct_mol_graph(smiles, mol, adj_mat, feat_mat):
         src, dst = tuple(zip(*edges))
     else:
         src, dst = [], []
-        
     molGraph.add_nodes(adj_mat.shape[0])
     molGraph.add_edges(src, dst)
     molGraph.ndata['feat'] = torch.tensor(feat_mat, dtype=torch.float32).to(device)
@@ -81,7 +80,7 @@ def smiles_to_mol_graph(smiles):
         return mol, construct_mol_graph(smiles, mol, adj_mat, node_feat_mat)
     except Exception as e:
         print(f"Error processing SMILES: {smiles}")
-        print(traceback.format_exc())  # 예외 정보를 출력
+        print(traceback.format_exc())
         return None, None
 
 
@@ -117,15 +116,42 @@ def read_dataset(file_name):
 #    target = np.array(data_mat[:, 1:3], dtype=np.float)
     target = np.array(data_mat[:, 1:3], dtype=float)
 
-
     for i in range(0, data_mat.shape[0]):
         mol, mol_graph = smiles_to_mol_graph(smiles[i])
 
         if mol is not None and mol_graph is not None:
+
             ####################################################
             # 1
-            mol_graph.MolWt = dsc.MolWt(mol)
-            mol_graph.HeavyAtomMolWt = dsc.HeavyAtomMolWt(mol)
+            mol_graph.MolLogP = dsc.MolLogP(mol)
+            mol_graph.fr_COO = dsc.fr_COO(mol)
+            mol_graph.Ipc = dsc.Ipc(mol)
+            mol_graph.fr_sulfonamd = dsc.fr_sulfonamd(mol)
+            mol_graph.PEOE_VSA7 = dsc.PEOE_VSA7(mol)
+            # 6
+            mol_graph.PEOE_VSA13 = dsc.PEOE_VSA13(mol)
+            mol_graph.SlogP_VSA10 = dsc.SlogP_VSA10(mol)
+            mol_graph.fr_unbrch_alkane = dsc.fr_unbrch_alkane(mol)
+            mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
+            mol_graph.PEOE_VSA12 = dsc.PEOE_VSA12(mol)
+            # 11
+            mol_graph.fr_guanido = dsc.fr_guanido(mol)
+            mol_graph.FpDensityMorgan1 = dsc.FpDensityMorgan1(mol)
+            mol_graph.NHOHCount = dsc.NHOHCount(mol)
+            mol_graph.fr_sulfide = dsc.fr_sulfide(mol)
+            mol_graph.VSA_EState5 = dsc.VSA_EState5(mol)
+            # 16
+            mol_graph.fr_HOCCN = dsc.fr_HOCCN(mol)
+            mol_graph.fr_piperdine = dsc.fr_piperdine(mol)
+            mol_graph.NumSaturatedCarbocycles = dsc.NumSaturatedCarbocycles(mol)
+            mol_graph.fr_amidine = dsc.fr_amidine(mol)
+            mol_graph.NumHDonors = dsc.NumHDonors(mol)
+            # 21
+            mol_graph.NumAromaticRings = dsc.NumAromaticRings(mol)
+            mol_graph.BalabanJ = dsc.BalabanJ(mol)
+            mol_graph.NumAromaticHeterocycles = dsc.NumAromaticHeterocycles(mol)
+            mol_graph.MinEStateIndex = dsc.MinEStateIndex(mol)
+            mol_graph.fr_Ar_N = dsc.fr_Ar_N(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
@@ -133,9 +159,38 @@ def read_dataset(file_name):
 
     ####################################################
     # 1
-    normalize_self_feat(mol_graphs, 'MolWt')
-    normalize_self_feat(mol_graphs, 'HeavyAtomMolWt')
+    normalize_self_feat(mol_graphs, 'MolLogP')
+    normalize_self_feat(mol_graphs, 'fr_COO')
+    normalize_self_feat(mol_graphs, 'Ipc')
+    normalize_self_feat(mol_graphs, 'fr_sulfonamd')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA7')
+    # 6
+    normalize_self_feat(mol_graphs, 'PEOE_VSA13')
+    normalize_self_feat(mol_graphs, 'SlogP_VSA10')
+    normalize_self_feat(mol_graphs, 'fr_unbrch_alkane')
+    normalize_self_feat(mol_graphs, 'SMR_VSA10')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA12')
+    # 11
+    normalize_self_feat(mol_graphs, 'fr_guanido')
+    normalize_self_feat(mol_graphs, 'FpDensityMorgan1')
+    normalize_self_feat(mol_graphs, 'NHOHCount')
+    normalize_self_feat(mol_graphs, 'fr_sulfide')
+    normalize_self_feat(mol_graphs, 'VSA_EState5')
+    # 16
+    normalize_self_feat(mol_graphs, 'fr_HOCCN')
+    normalize_self_feat(mol_graphs, 'fr_piperdine')
+    normalize_self_feat(mol_graphs, 'NumSaturatedCarbocycles')
+    normalize_self_feat(mol_graphs, 'fr_amidine')
+    normalize_self_feat(mol_graphs, 'NumHDonors')
+    # 21
+    normalize_self_feat(mol_graphs, 'NumAromaticRings')
+    normalize_self_feat(mol_graphs, 'BalabanJ')
+    normalize_self_feat(mol_graphs, 'NumAromaticHeterocycles')
+    normalize_self_feat(mol_graphs, 'MinEStateIndex')
+    normalize_self_feat(mol_graphs, 'fr_Ar_N')
+    ####################################################
 
     return samples
+
 
 atomic_props = read_atom_prop()

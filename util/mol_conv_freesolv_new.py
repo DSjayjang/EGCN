@@ -7,16 +7,16 @@ from rdkit import Chem
 from util import util
 #from mendeleev import get_table
 from mendeleev.fetch import fetch_table
-import traceback # 예외정보 추적
+import traceback
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 sel_prop_names = ['atomic_weight',
                 'atomic_radius',
-                # 'atomic_volume',
-                # 'dipole_polarizability',
-                # 'fusion_heat',
-                # 'thermal_conductivity',
-                # 'vdw_radius',
+                'atomic_volume',
+                'dipole_polarizability',
+                'fusion_heat',
+                'thermal_conductivity',
+                'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
 dim_self_feat = 50

@@ -55,7 +55,7 @@ print(device)
 # experiment parameters
 dataset_name = 'molproperty_vd'
 batch_size = 32
-max_epochs = 300
+max_epochs = 1000
 k = 5
 
 
@@ -225,13 +225,9 @@ def collate_emodel_elastic(samples):
         mol_graph = samples[i][0]
 
         ####################################################
-        # # 1
-        # self_feats[i, 0] = mol_graph.MolWt
-        # self_feats[i, 1] = mol_graph.HeavyAtomMolWt
         # 1
-        self_feats[i, 0] = mol_graph.NumHDonors
-        self_feats[i, 1] = mol_graph.NOCount
-        self_feats[i, 2] = mol_graph.TPSA
+        self_feats[i, 0] = mol_graph.MolWt
+        self_feats[i, 1] = mol_graph.HeavyAtomMolWt
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
