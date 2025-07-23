@@ -35,9 +35,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'molproperty_vd'
+dataset_name = 'lipo'
 batch_size = 32
-max_epochs = 1000
+max_epochs = 300
 k = 5
 
 
@@ -114,8 +114,8 @@ model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum')
-# criterion = nn.MSELoss(reduction='sum')
+# criterion = nn.L1Loss(reduction='sum')
+criterion = nn.MSELoss(reduction='sum')
 
 # train and evaluate competitors
 test_losses = dict()
@@ -125,25 +125,25 @@ test_losses = dict()
 # default model
 # don't touch
 
-# print('--------- GCN ---------')
-# test_losses['GCN'] = trainer.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
-# print('test loss (GCN): ' + str(test_losses['GCN']))
+print('--------- GCN ---------')
+test_losses['GCN'] = trainer.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
+print('test loss (GCN): ' + str(test_losses['GCN']))
 
-# print('--------- GAT ---------')
-# test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
-# print('test loss (GAT): ' + str(test_losses['GAT']))
+print('--------- GAT ---------')
+test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
+print('test loss (GAT): ' + str(test_losses['GAT']))
 
-# print('--------- EGCN_RING ---------')
-# test_losses['EGCN_R'] = trainer.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_ring)
-# print('test loss (EGCN_RING): ' + str(test_losses['EGCN_R']))
+print('--------- EGCN_RING ---------')
+test_losses['EGCN_R'] = trainer.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_ring)
+print('test loss (EGCN_RING): ' + str(test_losses['EGCN_R']))
 
-# print('--------- EGCN_SCALE ---------')
-# test_losses['EGCN_S'] = trainer.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_scale)
-# print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
+print('--------- EGCN_SCALE ---------')
+test_losses['EGCN_S'] = trainer.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_scale)
+print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
 
-print('--------- EGCN ---------')
-test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
-print('test loss (EGCN): ' + str(test_losses['EGCN']))
+# print('--------- EGCN ---------')
+# test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
+# print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
 print(test_losses)
 

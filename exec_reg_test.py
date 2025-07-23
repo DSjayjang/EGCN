@@ -37,9 +37,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'freesolv'
+dataset_name = 'lipo'
 batch_size = 32
-max_epochs = 1
+max_epochs = 300
 k = 5
 
 
@@ -116,8 +116,8 @@ model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum')
-# criterion = nn.MSELoss(reduction='sum')
+# criterion = nn.L1Loss(reduction='sum')
+criterion = nn.MSELoss(reduction='sum')
 
 # train and evaluate competitors
 test_losses = dict()
@@ -159,16 +159,27 @@ test_losses = dict()
 # test_losses['EGCN_S'] = trainer_test.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_scale)
 # print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
 
-print('--------- EGCN ---------')
-test_losses['EGCN'], best_model = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
-print('test loss (EGCN): ' + str(test_losses['EGCN']))
+# print('--------- EGCN ---------')
+# test_losses['EGCN'], best_model = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
+# print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
+
+
+print('--------- EGCN ---------')
+test_losses['EGCN'], best_model, best_k = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_model, trainer_test.val_model, collate_emodel)
+print('test loss (EGCN): ' + str(test_losses['EGCN']))
 print(test_losses)
 
 # 최종 평가
+"""
+need to split the dataset to train and test dataset
+"""
 test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel)
-final_test_loss, final_preds = trainer_test.final_test_emodel(best_model, criterion, test_data_loader)
+final_test_loss, final_preds = trainer_test.test_model(best_model, criterion, test_data_loader)
 
-print(f'Final Test Loss: {final_test_loss}')
+#=====================================================================#
+#=========================== Embedding : 2 ===========================#
 #=====================================================================#
 
+print('best_k-fold:', best_k)
+print(test_losses)
