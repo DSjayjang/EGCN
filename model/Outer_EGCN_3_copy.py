@@ -45,31 +45,35 @@ class Net(nn.Module):
         self.gc1 = GCNLayer(dim_in, 100)
         self.gc2 = GCNLayer(100, 20)
 
-        self.fc1 = nn.Linear(20 * dim_self_feat, 32)
-        self.fc2 = nn.Linear(32, 8)
-        self.fc3 = nn.Linear(8, dim_out)
-        # self.fc3 = nn.Linear(8, dim_out)
+        self.fc1 = nn.Linear(20 * dim_self_feat, 10)
+        self.fc2 = nn.Linear(10, dim_out)
+        # self.fc3 = nn.Linear(4, dim_out)
+        # self.fc3 = nn.Linear(16, dim_out)
 
-        self.bn1 = nn.BatchNorm1d(32)
-        self.bn2 = nn.BatchNorm1d(8)
+        self.bn1 = nn.BatchNorm1d(10)
         self.dropout = nn.Dropout(0.2)
 
+
     def forward(self, g, self_feat):
+        # 그래프 합성곱
         h = F.relu(self.gc1(g, g.ndata['feat']))
         h = F.relu(self.gc2(g, h))
         g.ndata['h'] = h
 
+        # 그래프 임베딩 생성
         hg = dgl.mean_nodes(g, 'h')
 
+        # 통합
         hg = hg.unsqueeze(2)
         self_feat = self_feat.unsqueeze(1)
         hg = torch.bmm(hg, self_feat)
         hg = hg.view(hg.size(0), -1)
 
-        out = F.relu(self.bn1(self.fc1(hg)))
-        out = self.dropout(out)
-        out = F.relu(self.bn2(self.fc2(out)))
-        
-        out = self.fc3(out)
+        # FCNN
+        # out = F.relu(self.bn1(self.fc1(hg)))
+        # out = self.dropout(out)
+
+        out = F.relu(self.fc1(hg))
+        out = self.fc2(out)
 
         return out
