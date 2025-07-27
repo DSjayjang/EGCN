@@ -4,6 +4,8 @@ import dgl
 import random
 import numpy as np
 import util.mol_conv_lipo as mc
+import copy
+import torch.optim as optim
 
 from model import EGCN_3
 from model import EGCN_5
@@ -20,7 +22,7 @@ from model import Outer_EGCN_20
 from model import Outer_EGCN_elastic
 
 from util import trainer
-from util import trainer_test
+from util import trainer_test_real
 
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
@@ -282,10 +284,11 @@ model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum') # MAE
-# criterion = nn.MSELoss(reduction='sum') # MSE
+# criterion = nn.L1Loss(reduction='sum') # MAE
+criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
+val_losses = dict()
 test_losses = dict()
 
 
@@ -370,23 +373,33 @@ test_losses = dict()
 #=====================================================================#
 
 
-print(test_losses)
-
-print('--------- Outer EGCN_elastic ---------')
-test_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_model, trainer_test.val_model, collate_emodel_elastic)
-print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
-print(test_losses)
 
 # 최종 평가
-"""
-need to split the dataset to train and test dataset
-"""
-test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel_elastic)
-final_test_loss, final_preds = trainer_test.test_model(best_model, criterion, test_data_loader)
+print('--------- Outer EGCN_elastic ---------')
+val_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel_elastic)
+print('Val loss (Outer_EGCN_elastic): ' + str(val_losses['Outer_EGCN_elastic']))
 
-#=====================================================================#
-#=========================== Embedding : 2 ===========================#
-#=====================================================================#
+final_model = copy.deepcopy(best_model)
+def weight_reset(m):
+    if hasattr(m, 'reset_parameters'):
+        m.reset_parameters()
+
+final_model.apply(weight_reset)
+
+
+optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+
+# 전체 트레이닝용 dataset
+train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel_elastic)
+final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
+
+# 트레이닝 평가용
+trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
+
+# final test
+test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel_elastic)
+test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
 
 print('best_k-fold:', best_k)
-print(test_losses)
+print('after k-fold, averaging of val_losses:', val_losses)
+print('test_losse:', test_loss)

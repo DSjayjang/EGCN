@@ -47,6 +47,92 @@ def train_model(model, criterion, optimizer, train_data_loader, max_epochs):
 
     return train_losses  # Epoch별 train loss, valid loss 반환 
 
+def collect_train_preds(model, criterion, train_data_loader):
+    preds = None
+    model.eval()
+
+    targets = None
+    self_feats = None
+
+    with torch.no_grad():
+        train_loss = 0
+        correct = 0
+
+        for bg, self_feat, target in train_data_loader:
+            pred = model(bg, self_feat)
+            loss = criterion(pred, target)
+            train_loss += loss.detach().item()
+
+            if preds is None:
+                preds = pred.clone().detach()
+                targets = target.clone().detach()
+                self_feats = self_feat.clone().detach()
+            else:
+                preds = torch.cat((preds, pred), dim=0)
+                targets = torch.cat((targets, target), dim=0)
+                self_feats = torch.cat((self_feats, self_feat), dim=0)
+
+            # if accs is not None:
+            #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+
+        train_loss /= len(train_data_loader.dataset)
+
+        # print('Test loss: ' + str(test_loss))
+
+    # if accs is not None:
+    #     accs.append(correct / len(test_data_loader.dataset) * 100)
+    #     print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+
+    preds = preds.cpu().numpy()
+    targets = targets.cpu().numpy()
+    self_feats = self_feats.cpu().numpy()
+    np.savetxt('result_train.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
+
+    # return train_loss, preds
+
+
+def final_train_model(model, criterion, optimizer, train_data_loader, max_epochs):
+    preds = None # pred 저장
+    # targets = None
+    # self_feats = None
+    
+    train_losses = [] # Train loss 저장
+    model.train()
+
+    for epoch in range(0, max_epochs):
+        train_loss = 0
+
+        for bg, self_feat, target in train_data_loader:
+            pred = model(bg, self_feat)
+            loss = criterion(pred, target)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.detach().item()
+
+            # new
+            if preds is None:
+                preds = pred.clone().detach()
+                targets = target.clone().detach()
+                self_feats = self_feat.clone().detach()
+            else:
+                preds = torch.cat((preds, pred), dim=0)
+                targets = torch.cat((targets, target), dim=0)
+                self_feats = torch.cat((self_feats, self_feat), dim=0)
+            # new
+
+        train_loss /= len(train_data_loader.dataset)
+        train_losses.append(train_loss)  # Save loss for this epoch
+
+        print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
+
+    preds = preds.detach().cpu().numpy()
+    targets = targets.cpu().numpy()
+    self_feats = self_feats.cpu().numpy()
+    np.savetxt('result_train.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
+
+    return train_losses  # Epoch별 train loss, valid loss 반환 
+
 
 # def val_model(model, criterion, val_data_loader, k, accs=None):
 def val_model(model, criterion, val_data_loader, k):
@@ -88,7 +174,7 @@ def val_model(model, criterion, val_data_loader, k):
     preds = preds.cpu().numpy()
     targets = targets.cpu().numpy()
     self_feats = self_feats.cpu().numpy()
-    np.savetxt(f'result_val_{k}.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
+    # np.savetxt(f'result_val_{k}.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
 
     return val_loss, preds
 

@@ -55,10 +55,10 @@ def construct_mol_graph(smiles, mol, adj_mat, feat_mat):
     molGraph = molDGLGraph(smiles, adj_mat, feat_mat, mol).to(device)
     edges = util.adj_mat_to_edges(adj_mat)
 
-    if edges:
-        src, dst = tuple(zip(*edges))
-    else:
-        src, dst = [], []
+    # if edges:
+    src, dst = tuple(zip(*edges))
+    # else:
+    #     src, dst = [], []
     molGraph.add_nodes(adj_mat.shape[0])
     molGraph.add_edges(src, dst)
     molGraph.ndata['feat'] = torch.tensor(feat_mat, dtype=torch.float32).to(device)
