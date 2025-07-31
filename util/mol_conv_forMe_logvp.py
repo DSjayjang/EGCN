@@ -121,15 +121,21 @@ def read_dataset(file_name):
             # 1
             mol_graph.NumHDonors = dsc.NumHDonors(mol)
             mol_graph.LabuteASA = dsc.LabuteASA(mol)
+            # # 1
+            # mol_graph.Chi1 = dsc.Chi1(mol)
+            # mol_graph.NumHDonors = dsc.NumHDonors(mol)
             ####################################################
 
             samples.append((mol_graph, target[i]))
             mol_graphs.append(mol_graph)
 
     ####################################################
-    # 1
+    1
     normalize_self_feat(mol_graphs, 'NumHDonors')
     normalize_self_feat(mol_graphs, 'LabuteASA')
+    # # 1
+    # normalize_self_feat(mol_graphs, 'Chi1')
+    # normalize_self_feat(mol_graphs, 'NumHDonors')
     return samples
 
 atomic_props = read_atom_prop()
