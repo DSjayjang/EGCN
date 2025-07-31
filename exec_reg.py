@@ -8,7 +8,6 @@ from model import GCN
 from model import GAT
 from model import EGCN
 from util import trainer
-from util import trainer_test
 
 # 재현성-난수 고정
 import os
@@ -35,7 +34,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'retry_logp'
+dataset_name = 'retry_logvp'
 batch_size = 32
 max_epochs = 300
 k = 5
