@@ -20,6 +20,28 @@ import pandas as pd
             #     targets = torch.cat((targets, target), dim=0)
             #     self_feats = torch.cat((self_feats, self_feat), dim=0)
 
+# GCN, GAT용
+def train_model_gcn(model, criterion, optimizer, train_data_loader, max_epochs):   
+    train_losses = [] # Train loss 저장
+    model.train()
+
+    for epoch in range(0, max_epochs):
+        train_loss = 0
+
+        for bg, target in train_data_loader:
+            pred = model(bg)
+            loss = criterion(pred, target)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.detach().item()
+
+        train_loss /= len(train_data_loader.dataset)
+        train_losses.append(train_loss)  # Save loss for this epoch
+
+        print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
+
+    return train_losses  # Epoch별 train loss, valid loss 반환 
 
 def train_model(model, criterion, optimizer, train_data_loader, max_epochs):
     # preds = None # pred 저장
@@ -46,6 +68,51 @@ def train_model(model, criterion, optimizer, train_data_loader, max_epochs):
         print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
 
     return train_losses  # Epoch별 train loss, valid loss 반환 
+
+# GCN, GAT용
+def collect_train_preds_gcn(model, criterion, train_data_loader):
+    preds = None
+    model.eval()
+
+    targets = None
+    # self_feats = None
+
+    with torch.no_grad():
+        train_loss = 0
+        correct = 0
+
+        for bg, target in train_data_loader:
+            pred = model(bg)
+            loss = criterion(pred, target)
+            train_loss += loss.detach().item()
+
+            if preds is None:
+                preds = pred.clone().detach()
+                targets = target.clone().detach()
+                # self_feats = self_feat.clone().detach()
+            else:
+                preds = torch.cat((preds, pred), dim=0)
+                targets = torch.cat((targets, target), dim=0)
+                # self_feats = torch.cat((self_feats, self_feat), dim=0)
+
+            # if accs is not None:
+            #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+
+        train_loss /= len(train_data_loader.dataset)
+
+        # print('Test loss: ' + str(test_loss))
+
+    # if accs is not None:
+    #     accs.append(correct / len(test_data_loader.dataset) * 100)
+    #     print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+
+    preds = preds.cpu().numpy()
+    targets = targets.cpu().numpy()
+    # self_feats = self_feats.cpu().numpy()
+    np.savetxt('result_train.csv', np.concatenate((targets, preds), axis=1), delimiter=',')
+
+    # return train_loss, preds
+
 
 def collect_train_preds(model, criterion, train_data_loader):
     preds = None
@@ -91,6 +158,51 @@ def collect_train_preds(model, criterion, train_data_loader):
     # return train_loss, preds
 
 
+# GCN, GAT용
+def final_train_model_gcn(model, criterion, optimizer, train_data_loader, max_epochs):
+    preds = None # pred 저장
+    # targets = None
+    # self_feats = None
+    
+    train_losses = [] # Train loss 저장
+    model.train()
+
+    for epoch in range(0, max_epochs):
+        train_loss = 0
+
+        for bg, target in train_data_loader:
+            pred = model(bg)
+            loss = criterion(pred, target)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.detach().item()
+
+            # new
+            if preds is None:
+                preds = pred.clone().detach()
+                targets = target.clone().detach()
+                # self_feats = self_feat.clone().detach()
+            else:
+                preds = torch.cat((preds, pred), dim=0)
+                targets = torch.cat((targets, target), dim=0)
+                # self_feats = torch.cat((self_feats, self_feat), dim=0)
+            # new
+
+        train_loss /= len(train_data_loader.dataset)
+        train_losses.append(train_loss)  # Save loss for this epoch
+
+        print('Epoch {}, train loss {:.4f}'.format(epoch + 1, train_loss))
+
+    preds = preds.detach().cpu().numpy()
+    targets = targets.cpu().numpy()
+    # self_feats = self_feats.cpu().numpy()
+    np.savetxt('result_train.csv', np.concatenate((targets, preds), axis=1), delimiter=',')
+
+    return train_losses  # Epoch별 train loss, valid loss 반환 
+
+
+
 def final_train_model(model, criterion, optimizer, train_data_loader, max_epochs):
     preds = None # pred 저장
     # targets = None
@@ -132,6 +244,50 @@ def final_train_model(model, criterion, optimizer, train_data_loader, max_epochs
     np.savetxt('result_train.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
 
     return train_losses  # Epoch별 train loss, valid loss 반환 
+
+# GCN, GAT용
+def val_model_gcn(model, criterion, val_data_loader, k):
+    preds = None
+    model.eval()
+
+    targets = None
+    # self_feats = None
+
+    with torch.no_grad():
+        val_loss = 0
+        correct = 0
+
+        for bg, target in val_data_loader:
+            pred = model(bg)
+            loss = criterion(pred, target)
+            val_loss += loss.detach().item()
+
+            if preds is None:
+                preds = pred.clone().detach()
+                targets = target.clone().detach()
+                # self_feats = self_feat.clone().detach()
+            else:
+                preds = torch.cat((preds, pred), dim=0)
+                targets = torch.cat((targets, target), dim=0)
+                # self_feats = torch.cat((self_feats, self_feat), dim=0)
+
+            # if accs is not None:
+            #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+
+        val_loss /= len(val_data_loader.dataset)
+
+        print('Val loss: ' + str(val_loss))
+
+    # if accs is not None:
+    #     accs.append(correct / len(val_data_loader.dataset) * 100)
+    #     print('Test accuracy: ' + str((correct / len(val_data_loader.dataset) * 100)) + '%')
+
+    preds = preds.cpu().numpy()
+    targets = targets.cpu().numpy()
+    # self_feats = self_feats.cpu().numpy()
+    # np.savetxt(f'result_val_{k}.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
+
+    return val_loss, preds
 
 
 # def val_model(model, criterion, val_data_loader, k, accs=None):
@@ -260,6 +416,51 @@ def cross_validation(dataset, model, criterion, num_folds, batch_size, max_epoch
     # else:
     #     return np.mean(val_losses), np.mean(accs), best_model, best_k
     
+# 최종 test용 / GCN, GAT용
+# def final_test_emodel(model, criterion, test_data_loader, accs=None):
+def test_model_gcn(model, criterion, test_data_loader):
+    preds = None
+    model.eval()
+
+    targets = None
+    # self_feats = None
+
+    with torch.no_grad():
+        test_loss = 0
+        correct = 0
+
+        for bg, target in test_data_loader:
+            pred = model(bg)
+            loss = criterion(pred, target)
+            test_loss += loss.detach().item()
+
+            if preds is None:
+                preds = pred.clone().detach()
+                targets = target.clone().detach()
+                # self_feats = self_feat.clone().detach()
+            else:
+                preds = torch.cat((preds, pred), dim=0)
+                targets = torch.cat((targets, target), dim=0)
+                # self_feats = torch.cat((self_feats, self_feat), dim=0)
+
+            # if accs is not None:
+            #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+
+        test_loss /= len(test_data_loader.dataset)
+
+        # print('Test loss: ' + str(test_loss))
+
+    # if accs is not None:
+    #     accs.append(correct / len(test_data_loader.dataset) * 100)
+    #     print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+
+    preds = preds.cpu().numpy()
+    targets = targets.cpu().numpy()
+    # self_feats = self_feats.cpu().numpy()
+    np.savetxt('result_test.csv', np.concatenate((targets, preds), axis=1), delimiter=',')
+
+    return test_loss, preds
+
 
 # 최종 test용
 # def final_test_emodel(model, criterion, test_data_loader, accs=None):

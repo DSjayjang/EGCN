@@ -4,11 +4,15 @@ import dgl
 import random
 import numpy as np
 import util.mol_conv as mc
+import copy
+import torch.optim as optim
+
+
 from model import GCN
 from model import GAT
 from model import EGCN
 from util import trainer
-from util import trainer_test
+from util import trainer_test_real
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -40,7 +44,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'molproperty_mp'
+dataset_name = 'lipo'
 batch_size = 32
 max_epochs = 300
 k = 5
@@ -130,74 +134,118 @@ model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum')
-# criterion = nn.MSELoss(reduction='sum')
+# criterion = nn.L1Loss(reduction='sum')
+criterion = nn.MSELoss(reduction='sum')
 
 # train and evaluate competitors
+val_losses = dict()
 test_losses = dict()
-
 
 #=====================================================================#
 # default model
 # don't touch
 
-print('--------- GCN ---------')
-test_losses['GCN'] = trainer.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
-print('test loss (GCN): ' + str(test_losses['GCN']))
-
-print('--------- GAT ---------')
-test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
-print('test loss (GAT): ' + str(test_losses['GAT']))
-
-print('--------- EGCN_RING ---------')
-test_losses['EGCN_R'] = trainer.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_ring)
-print('test loss (EGCN_RING): ' + str(test_losses['EGCN_R']))
-
-print('--------- EGCN_SCALE ---------')
-test_losses['EGCN_S'] = trainer.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_scale)
-print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
-
-print('--------- EGCN ---------')
-test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
-print('test loss (EGCN): ' + str(test_losses['EGCN']))
-
-print(test_losses)
-
-# #=====================================================================#
-
 # print('--------- GCN ---------')
-# test_losses['GCN'] = trainer_test.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer_test.train, trainer_test.test, collate)
+# test_losses['GCN'] = trainer.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
 # print('test loss (GCN): ' + str(test_losses['GCN']))
 
-# print('--------- EGCN_RING ---------')
-# test_losses['EGCN_R'] = trainer_test.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_ring)
-# print('test loss (EGCN_RING): ' + str(test_losses['EGCN_R']))
-
-# print('--------- EGCN_SCALE ---------')
-# test_losses['EGCN_S'] = trainer_test.cross_validation(dataset, model_EGCN_S, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_scale)
-# print('test loss (EGCN_SCALE): ' + str(test_losses['EGCN_S']))
+# print('--------- GAT ---------')
+# test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
+# print('test loss (GAT): ' + str(test_losses['GAT']))
 
 # print('--------- EGCN ---------')
-# test_losses['EGCN'], best_model = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel)
+# test_losses['EGCN'] = trainer.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel)
 # print('test loss (EGCN): ' + str(test_losses['EGCN']))
 
 
 
-# print('--------- EGCN ---------')
-# test_losses['EGCN'], best_model, best_k = trainer_test.cross_validation(dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test.train_model, trainer_test.val_model, collate_emodel)
-# print('test loss (EGCN): ' + str(test_losses['EGCN']))
-# print(test_losses)
+# 최종 평가
 
-# # 최종 평가
-# """
-# need to split the dataset to train and test dataset
-# """
-# test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel)
-# final_test_loss, final_preds = trainer_test.test_model(best_model, criterion, test_data_loader)
 
-#=====================================================================#
-#=========================== Embedding : 2 ===========================#
-#=====================================================================#
+# GCN
+
+print('--------- GCN ---------')
+val_losses['GCN'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer_test_real.train_model_gcn, trainer_test_real.val_model_gcn, collate)
+print('Val loss (GCN): ' + str(val_losses['GCN']))
+
+final_model = copy.deepcopy(best_model)
+def weight_reset(m):
+    if hasattr(m, 'reset_parameters'):
+        m.reset_parameters()
+
+final_model.apply(weight_reset)
+optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+
+# 전체 트레이닝용 dataset
+train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate)
+final_train_loss = trainer_test_real.train_model_gcn(final_model, criterion, optimizer, train_data_loader, max_epochs)
+
+# 트레이닝 평가용
+trainer_test_real.collect_train_preds_gcn(final_model, criterion, train_data_loader)
+
+# final test
+test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate)
+test_loss, final_preds = trainer_test_real.test_model_gcn(final_model, criterion, test_data_loader)
+
+print('best_k-fold:', best_k)
+print('after k-fold, averaging of val_losses:', val_losses)
+print('test_losse:', test_loss)
+
+
+# # GAT
+
+# print('--------- GAT ---------')
+# val_losses['GAT'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer_test_real.train_model_gcn, trainer_test_real.val_model_gcn, collate)
+# print('Val loss (GAT): ' + str(val_losses['GAT']))
+
+# final_model = copy.deepcopy(best_model)
+# def weight_reset(m):
+#     if hasattr(m, 'reset_parameters'):
+#         m.reset_parameters()
+
+# final_model.apply(weight_reset)
+# optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+
+# # 전체 트레이닝용 dataset
+# train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate)
+# final_train_loss = trainer_test_real.train_model_gcn(final_model, criterion, optimizer, train_data_loader, max_epochs)
+
+# # 트레이닝 평가용
+# trainer_test_real.collect_train_preds_gcn(final_model, criterion, train_data_loader)
+
+# # final test
+# test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate)
+# test_loss, final_preds = trainer_test_real.test_model_gcn(final_model, criterion, test_data_loader)
 
 # print('best_k-fold:', best_k)
-# print(test_losses)
+# print('after k-fold, averaging of val_losses:', val_losses)
+# print('test_losse:', test_loss)
+
+# # EGCN
+
+# print('--------- EGCN ---------')
+# val_losses['EGCN'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel)
+# print('Val loss (EGCN): ' + str(val_losses['EGCN']))
+
+# final_model = copy.deepcopy(best_model)
+# def weight_reset(m):
+#     if hasattr(m, 'reset_parameters'):
+#         m.reset_parameters()
+
+# final_model.apply(weight_reset)
+# optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+
+# # 전체 트레이닝용 dataset
+# train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel)
+# final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
+
+# # 트레이닝 평가용
+# trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
+
+# # final test
+# test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel)
+# test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
+
+# print('best_k-fold:', best_k)
+# print('after k-fold, averaging of val_losses:', val_losses)
+# print('test_losse:', test_loss)
