@@ -44,7 +44,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'lipo'
+dataset_name = 'logvp'
 batch_size = 32
 max_epochs = 300
 k = 5
@@ -162,34 +162,34 @@ test_losses = dict()
 # 최종 평가
 
 
-# GCN
+# # GCN
 
-print('--------- GCN ---------')
-val_losses['GCN'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer_test_real.train_model_gcn, trainer_test_real.val_model_gcn, collate)
-print('Val loss (GCN): ' + str(val_losses['GCN']))
+# print('--------- GCN ---------')
+# val_losses['GCN'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer_test_real.train_model_gcn, trainer_test_real.val_model_gcn, collate)
+# print('Val loss (GCN): ' + str(val_losses['GCN']))
 
-final_model = copy.deepcopy(best_model)
-def weight_reset(m):
-    if hasattr(m, 'reset_parameters'):
-        m.reset_parameters()
+# final_model = copy.deepcopy(best_model)
+# def weight_reset(m):
+#     if hasattr(m, 'reset_parameters'):
+#         m.reset_parameters()
 
-final_model.apply(weight_reset)
-optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+# final_model.apply(weight_reset)
+# optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
 
-# 전체 트레이닝용 dataset
-train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate)
-final_train_loss = trainer_test_real.train_model_gcn(final_model, criterion, optimizer, train_data_loader, max_epochs)
+# # 전체 트레이닝용 dataset
+# train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate)
+# final_train_loss = trainer_test_real.train_model_gcn(final_model, criterion, optimizer, train_data_loader, max_epochs)
 
-# 트레이닝 평가용
-trainer_test_real.collect_train_preds_gcn(final_model, criterion, train_data_loader)
+# # 트레이닝 평가용
+# trainer_test_real.collect_train_preds_gcn(final_model, criterion, train_data_loader)
 
-# final test
-test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate)
-test_loss, final_preds = trainer_test_real.test_model_gcn(final_model, criterion, test_data_loader)
+# # final test
+# test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate)
+# test_loss, final_preds = trainer_test_real.test_model_gcn(final_model, criterion, test_data_loader)
 
-print('best_k-fold:', best_k)
-print('after k-fold, averaging of val_losses:', val_losses)
-print('test_losse:', test_loss)
+# print('best_k-fold:', best_k)
+# print('after k-fold, averaging of val_losses:', val_losses)
+# print('test_losse:', test_loss)
 
 
 # # GAT
@@ -221,31 +221,31 @@ print('test_losse:', test_loss)
 # print('after k-fold, averaging of val_losses:', val_losses)
 # print('test_losse:', test_loss)
 
-# # EGCN
+# EGCN
 
-# print('--------- EGCN ---------')
-# val_losses['EGCN'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel)
-# print('Val loss (EGCN): ' + str(val_losses['EGCN']))
+print('--------- EGCN ---------')
+val_losses['EGCN'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_EGCN, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel)
+print('Val loss (EGCN): ' + str(val_losses['EGCN']))
 
-# final_model = copy.deepcopy(best_model)
-# def weight_reset(m):
-#     if hasattr(m, 'reset_parameters'):
-#         m.reset_parameters()
+final_model = copy.deepcopy(best_model)
+def weight_reset(m):
+    if hasattr(m, 'reset_parameters'):
+        m.reset_parameters()
 
-# final_model.apply(weight_reset)
-# optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+final_model.apply(weight_reset)
+optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
 
-# # 전체 트레이닝용 dataset
-# train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel)
-# final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
+# 전체 트레이닝용 dataset
+train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel)
+final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
 
-# # 트레이닝 평가용
-# trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
+# 트레이닝 평가용
+trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
 
-# # final test
-# test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel)
-# test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
+# final test
+test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel)
+test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
 
-# print('best_k-fold:', best_k)
-# print('after k-fold, averaging of val_losses:', val_losses)
-# print('test_losse:', test_loss)
+print('best_k-fold:', best_k)
+print('after k-fold, averaging of val_losses:', val_losses)
+print('test_losse:', test_loss)
