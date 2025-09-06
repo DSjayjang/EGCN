@@ -3,7 +3,7 @@ import torch.nn as nn
 import dgl
 import random
 import numpy as np
-import util.mol_conv_esol_new as mc
+import util.mol_conv_esol as mc
 import copy
 import torch.optim as optim
 
