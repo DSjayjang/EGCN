@@ -403,10 +403,10 @@ test_losses = dict()
 
 # #------------------------ Self Feature ------------------------#
 
-print('--------- Outer EGCN_elastic ---------')
-test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
-print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
-print('test_losse:', test_losses)
+# print('--------- Outer EGCN_elastic ---------')
+# test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
+# print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
+# print('test_losse:', test_losses)
 # print('--------- Outer EGCN_elastic ---------')
 # test_losses['Outer_EGCN_elastic'] = trainer_test.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic)
 # print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
@@ -414,32 +414,32 @@ print('test_losse:', test_losses)
 
 
 
-# # 최종 평가
-# print('--------- Outer EGCN_elastic ---------')
-# val_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel_elastic)
-# print('Val loss (Outer_EGCN_elastic): ' + str(val_losses['Outer_EGCN_elastic']))
+# 최종 평가
+print('--------- Outer EGCN_elastic ---------')
+val_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel_elastic)
+print('Val loss (Outer_EGCN_elastic): ' + str(val_losses['Outer_EGCN_elastic']))
 
-# final_model = copy.deepcopy(best_model)
-# def weight_reset(m):
-#     if hasattr(m, 'reset_parameters'):
-#         m.reset_parameters()
+final_model = copy.deepcopy(best_model)
+def weight_reset(m):
+    if hasattr(m, 'reset_parameters'):
+        m.reset_parameters()
 
-# final_model.apply(weight_reset)
+final_model.apply(weight_reset)
 
 
-# optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
+optimizer = optim.Adam(final_model.parameters(), weight_decay=0.01)
 
-# # 전체 트레이닝용 dataset
-# train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel_elastic)
-# final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
+# 전체 트레이닝용 dataset
+train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel_elastic)
+final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
 
-# # 트레이닝 평가용
-# trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
+# 트레이닝 평가용
+trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
 
-# # final test
-# test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel_elastic)
-# test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
+# final test
+test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel_elastic)
+test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
 
-# print('best_k-fold:', best_k)
-# print('after k-fold, averaging of val_losses:', val_losses)
-# print('test_losse:', test_loss)
+print('best_k-fold:', best_k)
+print('after k-fold, averaging of val_losses:', val_losses)
+print('test_losse:', test_loss)

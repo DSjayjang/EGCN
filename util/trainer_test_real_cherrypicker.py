@@ -47,7 +47,6 @@ def train_model(model, criterion, optimizer, train_data_loader, max_epochs):
     # preds = None # pred 저장
     # targets = None
     # self_feats = None
-    
     train_losses = [] # Train loss 저장
     model.train()
 
@@ -55,7 +54,7 @@ def train_model(model, criterion, optimizer, train_data_loader, max_epochs):
         train_loss = 0
 
         # for bg, self_feat, target in train_data_loader:
-        for bg, self_feat, target in train_data_loader:
+        for bg, self_feat, target, smiles in train_data_loader:
             pred = model(bg, self_feat)
             loss = criterion(pred, target)
             optimizer.zero_grad()
@@ -118,7 +117,7 @@ def collect_train_preds_gcn(model, criterion, train_data_loader):
 def collect_train_preds(model, criterion, train_data_loader):
     preds = None
     model.eval()
-
+    smiles_all = []
     targets = None
     self_feats = None
 
@@ -127,7 +126,7 @@ def collect_train_preds(model, criterion, train_data_loader):
         correct = 0
 
         # for bg, self_feat, target in train_data_loader:
-        for bg, self_feat, target in train_data_loader:
+        for bg, self_feat, target, smiles in train_data_loader:
             pred = model(bg, self_feat)
             loss = criterion(pred, target)
             train_loss += loss.detach().item()
@@ -144,6 +143,7 @@ def collect_train_preds(model, criterion, train_data_loader):
             # if accs is not None:
             #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
 
+            smiles_all.extend(smiles)
         train_loss /= len(train_data_loader.dataset)
 
         # print('Test loss: ' + str(test_loss))
@@ -156,6 +156,15 @@ def collect_train_preds(model, criterion, train_data_loader):
     targets = targets.cpu().numpy()
     self_feats = self_feats.cpu().numpy()
     np.savetxt('result_train.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
+
+
+    # DataFrame 생성
+    df = pd.DataFrame({
+        "smiles": smiles_all,
+        "target": targets.flatten(),
+        "pred": preds.flatten()
+    })
+    df.to_csv('cherry_train.csv', index = False)
 
     # return train_loss, preds
 
@@ -209,7 +218,7 @@ def final_train_model(model, criterion, optimizer, train_data_loader, max_epochs
     preds = None # pred 저장
     # targets = None
     # self_feats = None
-    
+    smiles_all = []
     train_losses = [] # Train loss 저장
     model.train()
 
@@ -305,7 +314,7 @@ def val_model(model, criterion, val_data_loader, k):
         correct = 0
 
         # for bg, self_feat, target in val_data_loader:
-        for bg, self_feat, target in val_data_loader:
+        for bg, self_feat, target,smiles in val_data_loader:
             pred = model(bg, self_feat)
             loss = criterion(pred, target)
             val_loss += loss.detach().item()
@@ -467,9 +476,54 @@ def test_model_gcn(model, criterion, test_data_loader):
 
 # 최종 test용
 # def final_test_emodel(model, criterion, test_data_loader, accs=None):
+# def test_model(model, criterion, test_data_loader):
+#     preds = None
+#     model.eval()
+#     targets = None
+#     self_feats = None
+
+#     with torch.no_grad():
+#         test_loss = 0
+#         correct = 0
+
+#         # for bg, self_feat, target in test_data_loader:
+#         for bg, self_feat, target in test_data_loader:
+#             pred = model(bg, self_feat)
+#             loss = criterion(pred, target)
+#             test_loss += loss.detach().item()
+
+#             if preds is None:
+#                 preds = pred.clone().detach()
+#                 targets = target.clone().detach()
+#                 self_feats = self_feat.clone().detach()
+#             else:
+#                 preds = torch.cat((preds, pred), dim=0)
+#                 targets = torch.cat((targets, target), dim=0)
+#                 self_feats = torch.cat((self_feats, self_feat), dim=0)
+
+#             # if accs is not None:
+#             #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+#         test_loss /= len(test_data_loader.dataset)
+
+#         # print('Test loss: ' + str(test_loss))
+
+#     # if accs is not None:
+#     #     accs.append(correct / len(test_data_loader.dataset) * 100)
+#     #     print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+
+#     preds = preds.cpu().numpy()
+#     targets = targets.cpu().numpy()
+#     self_feats = self_feats.cpu().numpy()
+#     np.savetxt('result_test.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
+
+#     return test_loss, preds
+
+# 최종 test용
+# def final_test_emodel(model, criterion, test_data_loader, accs=None):
 def test_model(model, criterion, test_data_loader):
     preds = None
     model.eval()
+    smiles_all = []
     targets = None
     self_feats = None
 
@@ -478,7 +532,7 @@ def test_model(model, criterion, test_data_loader):
         correct = 0
 
         # for bg, self_feat, target in test_data_loader:
-        for bg, self_feat, target in test_data_loader:
+        for bg, self_feat, target, smiles in test_data_loader:
             pred = model(bg, self_feat)
             loss = criterion(pred, target)
             test_loss += loss.detach().item()
@@ -494,6 +548,7 @@ def test_model(model, criterion, test_data_loader):
 
             # if accs is not None:
             #     correct += torch.eq(torch.max(pred, dim=1)[1], target).sum().item()
+            smiles_all.extend(smiles)
         test_loss /= len(test_data_loader.dataset)
 
         # print('Test loss: ' + str(test_loss))
@@ -501,12 +556,20 @@ def test_model(model, criterion, test_data_loader):
     # if accs is not None:
     #     accs.append(correct / len(test_data_loader.dataset) * 100)
     #     print('Test accuracy: ' + str((correct / len(test_data_loader.dataset) * 100)) + '%')
+    # smiles_all = [s for batch in smiles_all for s in batch]
 
     preds = preds.cpu().numpy()
     targets = targets.cpu().numpy()
     self_feats = self_feats.cpu().numpy()
     np.savetxt('result_test.csv', np.concatenate((targets, preds, self_feats), axis=1), delimiter=',')
 
+    # DataFrame 생성
+    df = pd.DataFrame({
+        "smiles": smiles_all,
+        "target": targets.flatten(),
+        "pred": preds.flatten()
+    })
+    df.to_csv('cherry_test.csv', index = False)
     return test_loss, preds
 
 

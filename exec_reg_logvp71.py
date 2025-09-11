@@ -3,7 +3,7 @@ import torch.nn as nn
 import dgl
 import random
 import numpy as np
-import util.mol_conv_logvp28 as mc
+import util.mol_conv_logvp71 as mc
 import copy
 import torch.optim as optim
 
@@ -53,10 +53,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'logvp_cp'
+dataset_name = 'vp_unique'
 batch_size = 128
-max_epochs = 300
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):
@@ -94,8 +94,8 @@ def collate_emodel_elastic_3(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
+        self_feats[i, 1] = mol_graph.SlogP_VSA12
+        self_feats[i, 2] = mol_graph.NumHAcceptors
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -113,10 +113,10 @@ def collate_emodel_elastic_5(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 1] = mol_graph.SlogP_VSA12
+        self_feats[i, 2] = mol_graph.NumHAcceptors
+        self_feats[i, 3] = mol_graph.fr_halogen
+        self_feats[i, 4] = mol_graph.Kappa1
         ####################################################
     graphs, labels = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
@@ -133,13 +133,13 @@ def collate_emodel_elastic_7(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 1] = mol_graph.SlogP_VSA12
+        self_feats[i, 2] = mol_graph.NumHAcceptors
+        self_feats[i, 3] = mol_graph.fr_halogen
+        self_feats[i, 4] = mol_graph.Kappa1
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
+        self_feats[i, 5] = mol_graph.BertzCT
+        self_feats[i, 6] = mol_graph.NumHDonors
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -157,16 +157,16 @@ def collate_emodel_elastic_10(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 1] = mol_graph.SlogP_VSA12
+        self_feats[i, 2] = mol_graph.NumHAcceptors
+        self_feats[i, 3] = mol_graph.fr_halogen
+        self_feats[i, 4] = mol_graph.Kappa1
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
-        self_feats[i, 7] = mol_graph.RingCount
-        self_feats[i, 8] = mol_graph.SMR_VSA7
-        self_feats[i, 9] = mol_graph.fr_halogen
+        self_feats[i, 5] = mol_graph.BertzCT
+        self_feats[i, 6] = mol_graph.NumHDonors
+        self_feats[i, 7] = mol_graph.MolMR
+        self_feats[i, 8] = mol_graph.Chi3n
+        self_feats[i, 9] = mol_graph.HallKierAlpha
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -184,28 +184,28 @@ def collate_emodel_elastic_20(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 1] = mol_graph.SlogP_VSA12
+        self_feats[i, 2] = mol_graph.NumHAcceptors
+        self_feats[i, 3] = mol_graph.fr_halogen
+        self_feats[i, 4] = mol_graph.Kappa1
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
-        self_feats[i, 7] = mol_graph.RingCount
-        self_feats[i, 8] = mol_graph.SMR_VSA7
-        self_feats[i, 9] = mol_graph.fr_halogen
+        self_feats[i, 5] = mol_graph.BertzCT
+        self_feats[i, 6] = mol_graph.NumHDonors
+        self_feats[i, 7] = mol_graph.MolMR
+        self_feats[i, 8] = mol_graph.Chi3n
+        self_feats[i, 9] = mol_graph.HallKierAlpha
         # 11
-        self_feats[i, 10] = mol_graph.Chi2n
-        self_feats[i, 11] = mol_graph.NumHeteroatoms
-        self_feats[i, 12] = mol_graph.Chi1v
-        self_feats[i, 13] = mol_graph.SMR_VSA10
-        self_feats[i, 14] = mol_graph.VSA_EState1
+        self_feats[i, 10] = mol_graph.VSA_EState8
+        self_feats[i, 11] = mol_graph.Chi1
+        self_feats[i, 12] = mol_graph.fr_Ar_N
+        self_feats[i, 13] = mol_graph.NumAliphaticHeterocycles
+        self_feats[i, 14] = mol_graph.BCUT2D_CHGLO
         # 16
-        self_feats[i, 15] = mol_graph.VSA_EState6
-        self_feats[i, 16] = mol_graph.MolLogP
-        self_feats[i, 17] = mol_graph.Chi4n
-        self_feats[i, 18] = mol_graph.Chi0v
-        self_feats[i, 19] = mol_graph.BertzCT
+        self_feats[i, 15] = mol_graph.RingCount
+        self_feats[i, 16] = mol_graph.SMR_VSA1
+        self_feats[i, 17] = mol_graph.SMR_VSA10
+        self_feats[i, 18] = mol_graph.FractionCSP3
+        self_feats[i, 19] = mol_graph.BCUT2D_CHGHI
         ####################################################
 
     graphs, labels = map(list, zip(*samples))
@@ -224,30 +224,46 @@ def collate_emodel_elastic(samples):
         ####################################################
         # 1
         self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 1] = mol_graph.SlogP_VSA12
+        self_feats[i, 2] = mol_graph.NumHAcceptors
+        self_feats[i, 3] = mol_graph.fr_halogen
+        self_feats[i, 4] = mol_graph.Kappa1
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
-        self_feats[i, 7] = mol_graph.RingCount
-        self_feats[i, 8] = mol_graph.SMR_VSA7
-        self_feats[i, 9] = mol_graph.fr_halogen
+        self_feats[i, 5] = mol_graph.BertzCT
+        self_feats[i, 6] = mol_graph.NumHDonors
+        self_feats[i, 7] = mol_graph.MolMR
+        self_feats[i, 8] = mol_graph.Chi3n
+        self_feats[i, 9] = mol_graph.HallKierAlpha
         # 11
-        self_feats[i, 10] = mol_graph.Chi2n
-        self_feats[i, 11] = mol_graph.NumHeteroatoms
-        self_feats[i, 12] = mol_graph.Chi1v
-        self_feats[i, 13] = mol_graph.SMR_VSA10
-        self_feats[i, 14] = mol_graph.VSA_EState1
+        self_feats[i, 10] = mol_graph.VSA_EState8
+        self_feats[i, 11] = mol_graph.Chi1
+        self_feats[i, 12] = mol_graph.fr_Ar_N
+        self_feats[i, 13] = mol_graph.NumAliphaticHeterocycles
+        self_feats[i, 14] = mol_graph.BCUT2D_CHGLO
         # 16
-        self_feats[i, 15] = mol_graph.VSA_EState6
-        self_feats[i, 16] = mol_graph.MolLogP
-        self_feats[i, 17] = mol_graph.Chi4n
-        self_feats[i, 18] = mol_graph.Chi0v
-        self_feats[i, 19] = mol_graph.BertzCT
+        self_feats[i, 15] = mol_graph.RingCount
+        self_feats[i, 16] = mol_graph.SMR_VSA1
+        self_feats[i, 17] = mol_graph.SMR_VSA10
+        self_feats[i, 18] = mol_graph.FractionCSP3
+        self_feats[i, 19] = mol_graph.BCUT2D_CHGHI
         # 21
-        self_feats[i, 20] = mol_graph.HallKierAlpha
+        self_feats[i, 20] = mol_graph.fr_unbrch_alkane
+        self_feats[i, 21] = mol_graph.fr_azo
+        self_feats[i, 22] = mol_graph.SMR_VSA6
+        self_feats[i, 23] = mol_graph.NOCount
+        self_feats[i, 24] = mol_graph.NumAromaticRings
+        # 26
+        self_feats[i, 25] = mol_graph.SlogP_VSA6
+        self_feats[i, 26] = mol_graph.NumSaturatedRings
+        self_feats[i, 27] = mol_graph.fr_methoxy
+        self_feats[i, 28] = mol_graph.fr_ether
+        self_feats[i, 29] = mol_graph.SMR_VSA7
+        # 31
+        self_feats[i, 30] = mol_graph.VSA_EState9
+        self_feats[i, 31] = mol_graph.fr_alkyl_halide
+        self_feats[i, 32] = mol_graph.BCUT2D_LOGPHI
+        self_feats[i, 33] = mol_graph.fr_NH0
+        self_feats[i, 34] = mol_graph.NumAromaticCarbocycles
         ####################################################
 
     graphs, labels = map(list, zip(*samples))

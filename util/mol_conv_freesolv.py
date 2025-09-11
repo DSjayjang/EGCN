@@ -181,6 +181,7 @@ def read_dataset(file_name):
             mol_graph.FractionCSP3 = dsc.FractionCSP3(mol)
             ####################################################
 
+            # samples.append((mol_graph, target[i]))
             samples.append((mol_graph, target[i]))
             mol_graphs.append(mol_graph)
 
