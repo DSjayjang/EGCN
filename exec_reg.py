@@ -105,7 +105,7 @@ random.shuffle(dataset)
 # default model
 # don't touch
 model_GCN = GCN.Net(mc.dim_atomic_feat, 1).to(device)
-# model_GAT = GAT.Net(mc.dim_atomic_feat, 1, 4).to(device)
+model_GAT = GAT.Net(mc.dim_atomic_feat, 1, 4).to(device)
 model_EGCN_R = EGCN.Net(mc.dim_atomic_feat, 1, 1).to(device)
 model_EGCN_S = EGCN.Net(mc.dim_atomic_feat, 1, 2).to(device)
 model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
@@ -128,9 +128,9 @@ print('--------- GCN ---------')
 test_losses['GCN'] = trainer.cross_validation(dataset, model_GCN, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
 print('test loss (GCN): ' + str(test_losses['GCN']))
 
-# print('--------- GAT ---------')
-# test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
-# print('test loss (GAT): ' + str(test_losses['GAT']))
+print('--------- GAT ---------')
+test_losses['GAT'] = trainer.cross_validation(dataset, model_GAT, criterion, k, batch_size, max_epochs, trainer.train, trainer.test, collate)
+print('test loss (GAT): ' + str(test_losses['GAT']))
 
 print('--------- EGCN_RING ---------')
 test_losses['EGCN_R'] = trainer.cross_validation(dataset, model_EGCN_R, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_ring)
