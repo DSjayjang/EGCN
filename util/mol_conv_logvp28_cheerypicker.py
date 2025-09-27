@@ -19,7 +19,7 @@ sel_prop_names = ['atomic_weight',
                 'vdw_radius',
                 'en_pauling']
 dim_atomic_feat = len(sel_prop_names)
-dim_self_feat = 21
+dim_self_feat = 23
 
 
 class molDGLGraph(dgl.DGLGraph):
@@ -119,31 +119,33 @@ def read_dataset(file_name):
         if mol is not None and mol_graph is not None:
             ####################################################
             # 1
-            mol_graph.TPSA = dsc.TPSA(mol)
             mol_graph.MolMR = dsc.MolMR(mol)
-            mol_graph.Chi1 = dsc.Chi1(mol)
-            mol_graph.NumHAcceptors = dsc.NumHAcceptors(mol)
-            mol_graph.NumAromaticRings = dsc.NumAromaticRings(mol)
-            # 6
-            mol_graph.NOCount = dsc.NOCount(mol)
+            mol_graph.TPSA = dsc.TPSA(mol)
+            mol_graph.fr_halogen = dsc.fr_halogen(mol)
             mol_graph.SlogP_VSA12 = dsc.SlogP_VSA12(mol)
             mol_graph.RingCount = dsc.RingCount(mol)
+            # 6
+            mol_graph.Kappa1 = dsc.Kappa1(mol)
+            mol_graph.NumHAcceptors = dsc.NumHAcceptors(mol)
+            mol_graph.NumHDonors = dsc.NumHDonors(mol)
             mol_graph.SMR_VSA7 = dsc.SMR_VSA7(mol)
-            mol_graph.fr_halogen = dsc.fr_halogen(mol)
+            mol_graph.SMR_VSA5 = dsc.SMR_VSA5(mol)
             # 11
-            mol_graph.Chi2n = dsc.Chi2n(mol)
-            mol_graph.NumHeteroatoms = dsc.NumHeteroatoms(mol)
-            mol_graph.Chi1v = dsc.Chi1v(mol)
-            mol_graph.SMR_VSA10 = dsc.SMR_VSA10(mol)
-            mol_graph.VSA_EState1 = dsc.VSA_EState1(mol)
-            # 16
-            mol_graph.VSA_EState6 = dsc.VSA_EState6(mol)
-            mol_graph.MolLogP = dsc.MolLogP(mol)
-            mol_graph.Chi4n = dsc.Chi4n(mol)
-            mol_graph.Chi0v = dsc.Chi0v(mol)
+            mol_graph.Chi1 = dsc.Chi1(mol)
+            mol_graph.Chi3n = dsc.Chi3n(mol)
             mol_graph.BertzCT = dsc.BertzCT(mol)
-            # 21
+            mol_graph.VSA_EState8 = dsc.VSA_EState8(mol)
+            mol_graph.NumAliphaticCarbocycles = dsc.NumAliphaticCarbocycles(mol)
+            # 16
             mol_graph.HallKierAlpha = dsc.HallKierAlpha(mol)
+            mol_graph.VSA_EState6 = dsc.VSA_EState6(mol)
+            mol_graph.NumAromaticRings = dsc.NumAromaticRings(mol)
+            mol_graph.Chi4n = dsc.Chi4n(mol)
+            mol_graph.PEOE_VSA7 = dsc.PEOE_VSA7(mol)
+            # 21
+            mol_graph.SlogP_VSA5 = dsc.SlogP_VSA5(mol)
+            mol_graph.VSA_EState7 = dsc.VSA_EState7(mol)
+            mol_graph.NOCount = dsc.NOCount(mol)
             ####################################################
 
             samples.append((mol_graph, target[i], smiles[i]))
@@ -151,31 +153,33 @@ def read_dataset(file_name):
 
     ####################################################
     # 1
-    normalize_self_feat(mol_graphs, 'TPSA')
     normalize_self_feat(mol_graphs, 'MolMR')
-    normalize_self_feat(mol_graphs, 'Chi1')
-    normalize_self_feat(mol_graphs, 'NumHAcceptors')
-    normalize_self_feat(mol_graphs, 'NumAromaticRings')
-    # 6
-    normalize_self_feat(mol_graphs, 'NOCount')
+    normalize_self_feat(mol_graphs, 'TPSA')
+    normalize_self_feat(mol_graphs, 'fr_halogen')
     normalize_self_feat(mol_graphs, 'SlogP_VSA12')
     normalize_self_feat(mol_graphs, 'RingCount')
+    # 6
+    normalize_self_feat(mol_graphs, 'Kappa1')
+    normalize_self_feat(mol_graphs, 'NumHAcceptors')
+    normalize_self_feat(mol_graphs, 'NumHDonors')
     normalize_self_feat(mol_graphs, 'SMR_VSA7')
-    normalize_self_feat(mol_graphs, 'fr_halogen')
+    normalize_self_feat(mol_graphs, 'SMR_VSA5')
     # 11
-    normalize_self_feat(mol_graphs, 'Chi2n')
-    normalize_self_feat(mol_graphs, 'NumHeteroatoms')
-    normalize_self_feat(mol_graphs, 'Chi1v')
-    normalize_self_feat(mol_graphs, 'SMR_VSA10')
-    normalize_self_feat(mol_graphs, 'VSA_EState1')
-    # 16
-    normalize_self_feat(mol_graphs, 'VSA_EState6')
-    normalize_self_feat(mol_graphs, 'MolLogP')
-    normalize_self_feat(mol_graphs, 'Chi4n')
-    normalize_self_feat(mol_graphs, 'Chi0v')
+    normalize_self_feat(mol_graphs, 'Chi1')
+    normalize_self_feat(mol_graphs, 'Chi3n')
     normalize_self_feat(mol_graphs, 'BertzCT')
-    # 21
+    normalize_self_feat(mol_graphs, 'VSA_EState8')
+    normalize_self_feat(mol_graphs, 'NumAliphaticCarbocycles')
+    # 16
     normalize_self_feat(mol_graphs, 'HallKierAlpha')
+    normalize_self_feat(mol_graphs, 'VSA_EState6')
+    normalize_self_feat(mol_graphs, 'NumAromaticRings')
+    normalize_self_feat(mol_graphs, 'Chi4n')
+    normalize_self_feat(mol_graphs, 'PEOE_VSA7')
+    # 21
+    normalize_self_feat(mol_graphs, 'SlogP_VSA5')
+    normalize_self_feat(mol_graphs, 'VSA_EState7')
+    normalize_self_feat(mol_graphs, 'NOCount')
     return samples
 
 atomic_props = read_atom_prop()

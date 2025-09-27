@@ -53,7 +53,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'logvp_cp'
+dataset_name = 'logvp_cp_0927'
 batch_size = 128
 max_epochs = 1
 k = 2
@@ -93,15 +93,16 @@ def collate_emodel_elastic_3(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
+        self_feats[i, 0] = mol_graph.MolMR
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.fr_halogen
         ####################################################
 
     graphs, labels, smiles = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+    # return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
 
 
 def collate_emodel_elastic_5(samples):
@@ -112,16 +113,17 @@ def collate_emodel_elastic_5(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 0] = mol_graph.MolMR
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.fr_halogen
+        self_feats[i, 3] = mol_graph.SlogP_VSA12
+        self_feats[i, 4] = mol_graph.RingCount
         ####################################################
     graphs, labels, smiles = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+    # return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
         
 
 def collate_emodel_elastic_7(samples):
@@ -132,20 +134,21 @@ def collate_emodel_elastic_7(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 0] = mol_graph.MolMR
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.fr_halogen
+        self_feats[i, 3] = mol_graph.SlogP_VSA12
+        self_feats[i, 4] = mol_graph.RingCount
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
+        self_feats[i, 5] = mol_graph.Kappa1
+        self_feats[i, 6] = mol_graph.NumHAcceptors
         ####################################################
 
     graphs, labels, smiles = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+    # return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
 
 
 def collate_emodel_elastic_10(samples):
@@ -156,23 +159,24 @@ def collate_emodel_elastic_10(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 0] = mol_graph.MolMR
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.fr_halogen
+        self_feats[i, 3] = mol_graph.SlogP_VSA12
+        self_feats[i, 4] = mol_graph.RingCount
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
-        self_feats[i, 7] = mol_graph.RingCount
+        self_feats[i, 5] = mol_graph.Kappa1
+        self_feats[i, 6] = mol_graph.NumHAcceptors
+        self_feats[i, 7] = mol_graph.NumHDonors
         self_feats[i, 8] = mol_graph.SMR_VSA7
-        self_feats[i, 9] = mol_graph.fr_halogen
+        self_feats[i, 9] = mol_graph.SMR_VSA5
         ####################################################
 
     graphs, labels, smiles = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+    # return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
 
 
 def collate_emodel_elastic_20(samples):
@@ -183,35 +187,36 @@ def collate_emodel_elastic_20(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 0] = mol_graph.MolMR
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.fr_halogen
+        self_feats[i, 3] = mol_graph.SlogP_VSA12
+        self_feats[i, 4] = mol_graph.RingCount
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
-        self_feats[i, 7] = mol_graph.RingCount
+        self_feats[i, 5] = mol_graph.Kappa1
+        self_feats[i, 6] = mol_graph.NumHAcceptors
+        self_feats[i, 7] = mol_graph.NumHDonors
         self_feats[i, 8] = mol_graph.SMR_VSA7
-        self_feats[i, 9] = mol_graph.fr_halogen
+        self_feats[i, 9] = mol_graph.SMR_VSA5
         # 11
-        self_feats[i, 10] = mol_graph.Chi2n
-        self_feats[i, 11] = mol_graph.NumHeteroatoms
-        self_feats[i, 12] = mol_graph.Chi1v
-        self_feats[i, 13] = mol_graph.SMR_VSA10
-        self_feats[i, 14] = mol_graph.VSA_EState1
+        self_feats[i, 10] = mol_graph.Chi1
+        self_feats[i, 11] = mol_graph.Chi3n
+        self_feats[i, 12] = mol_graph.BertzCT
+        self_feats[i, 13] = mol_graph.VSA_EState8
+        self_feats[i, 14] = mol_graph.NumAliphaticCarbocycles
         # 16
-        self_feats[i, 15] = mol_graph.VSA_EState6
-        self_feats[i, 16] = mol_graph.MolLogP
-        self_feats[i, 17] = mol_graph.Chi4n
-        self_feats[i, 18] = mol_graph.Chi0v
-        self_feats[i, 19] = mol_graph.BertzCT
+        self_feats[i, 15] = mol_graph.HallKierAlpha
+        self_feats[i, 16] = mol_graph.VSA_EState6
+        self_feats[i, 17] = mol_graph.NumAromaticRings
+        self_feats[i, 18] = mol_graph.Chi4n
+        self_feats[i, 19] = mol_graph.PEOE_VSA7
         ####################################################
 
     graphs, labels, smiles = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+    # return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
 ########################################################################################################
 
 
@@ -223,37 +228,40 @@ def collate_emodel_elastic(samples):
 
         ####################################################
         # 1
-        self_feats[i, 0] = mol_graph.TPSA
-        self_feats[i, 1] = mol_graph.MolMR
-        self_feats[i, 2] = mol_graph.Chi1
-        self_feats[i, 3] = mol_graph.NumHAcceptors
-        self_feats[i, 4] = mol_graph.NumAromaticRings
+        self_feats[i, 0] = mol_graph.MolMR
+        self_feats[i, 1] = mol_graph.TPSA
+        self_feats[i, 2] = mol_graph.fr_halogen
+        self_feats[i, 3] = mol_graph.SlogP_VSA12
+        self_feats[i, 4] = mol_graph.RingCount
         # 6
-        self_feats[i, 5] = mol_graph.NOCount
-        self_feats[i, 6] = mol_graph.SlogP_VSA12
-        self_feats[i, 7] = mol_graph.RingCount
+        self_feats[i, 5] = mol_graph.Kappa1
+        self_feats[i, 6] = mol_graph.NumHAcceptors
+        self_feats[i, 7] = mol_graph.NumHDonors
         self_feats[i, 8] = mol_graph.SMR_VSA7
-        self_feats[i, 9] = mol_graph.fr_halogen
+        self_feats[i, 9] = mol_graph.SMR_VSA5
         # 11
-        self_feats[i, 10] = mol_graph.Chi2n
-        self_feats[i, 11] = mol_graph.NumHeteroatoms
-        self_feats[i, 12] = mol_graph.Chi1v
-        self_feats[i, 13] = mol_graph.SMR_VSA10
-        self_feats[i, 14] = mol_graph.VSA_EState1
+        self_feats[i, 10] = mol_graph.Chi1
+        self_feats[i, 11] = mol_graph.Chi3n
+        self_feats[i, 12] = mol_graph.BertzCT
+        self_feats[i, 13] = mol_graph.VSA_EState8
+        self_feats[i, 14] = mol_graph.NumAliphaticCarbocycles
         # 16
-        self_feats[i, 15] = mol_graph.VSA_EState6
-        self_feats[i, 16] = mol_graph.MolLogP
-        self_feats[i, 17] = mol_graph.Chi4n
-        self_feats[i, 18] = mol_graph.Chi0v
-        self_feats[i, 19] = mol_graph.BertzCT
+        self_feats[i, 15] = mol_graph.HallKierAlpha
+        self_feats[i, 16] = mol_graph.VSA_EState6
+        self_feats[i, 17] = mol_graph.NumAromaticRings
+        self_feats[i, 18] = mol_graph.Chi4n
+        self_feats[i, 19] = mol_graph.PEOE_VSA7
         # 21
-        self_feats[i, 20] = mol_graph.HallKierAlpha
+        self_feats[i, 20] = mol_graph.SlogP_VSA5
+        self_feats[i, 21] = mol_graph.VSA_EState7
+        self_feats[i, 22] = mol_graph.NOCount
         ####################################################
 
     graphs, labels, smiles = map(list, zip(*samples))
     batched_graph = dgl.batch(graphs)
 
-    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
+    return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device)
+    # return batched_graph, torch.tensor(self_feats).to(device), torch.tensor(labels, dtype=torch.float32).to(device), smiles
 ########################################################################################################
 
 
@@ -297,8 +305,8 @@ model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_
 
 
 # define loss function
-# criterion = nn.L1Loss(reduction='sum') # MAE
-criterion = nn.MSELoss(reduction='sum') # MSE
+criterion = nn.L1Loss(reduction='sum') # MAE
+# criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
 val_losses = dict()
