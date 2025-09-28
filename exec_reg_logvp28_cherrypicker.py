@@ -23,7 +23,8 @@ from model import Outer_EGCN_20
 from model import Outer_EGCN_elastic
 
 from util import trainer
-from util import trainer_test_real_cherrypicker
+from util import trainer_test_real
+# from util import trainer_test_real_cherrypicker
 
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
@@ -55,8 +56,8 @@ print(device)
 # experiment parameters
 dataset_name = 'logvp_cp_0927'
 batch_size = 128
-max_epochs = 1
-k = 2
+max_epochs = 300
+k = 5
 
 
 def collate(samples):
@@ -305,8 +306,8 @@ model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum') # MAE
-# criterion = nn.MSELoss(reduction='sum') # MSE
+# criterion = nn.L1Loss(reduction='sum') # MAE
+criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
 val_losses = dict()
@@ -349,7 +350,7 @@ print('--------- EGCN_20 ---------')
 test_losses['EGCN_20'] = trainer.cross_validation(dataset, model_EGCN_20, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic_20)
 print('test loss (EGCN_20): ' + str(test_losses['EGCN_20']))
 
-# feature 20개
+# feature elastic개
 print('--------- EGCN_elastic ---------')
 test_losses['EGCN_elastic'] = trainer.cross_validation(dataset, model_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
 print('test loss (EGCN_elastic): ' + str(test_losses['EGCN_elastic']))
@@ -399,7 +400,7 @@ print(test_losses)
 
 # # 최종 평가
 # print('--------- Outer EGCN_elastic ---------')
-# val_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test_real_cherrypicker.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test_real_cherrypicker.train_model, trainer_test_real_cherrypicker.val_model, collate_emodel_elastic)
+# val_losses['Outer_EGCN_elastic'], best_model, best_k = trainer_test_real.cross_validation(train_dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test_real.train_model, trainer_test_real.val_model, collate_emodel_elastic)
 # print('Val loss (Outer_EGCN_elastic): ' + str(val_losses['Outer_EGCN_elastic']))
 
 # final_model = copy.deepcopy(best_model)
@@ -414,14 +415,14 @@ print(test_losses)
 
 # # 전체 트레이닝용 dataset
 # train_data_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True, collate_fn = collate_emodel_elastic)
-# final_train_loss = trainer_test_real_cherrypicker.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
+# final_train_loss = trainer_test_real.train_model(final_model, criterion, optimizer, train_data_loader, max_epochs)
 
 # # 트레이닝 평가용
-# trainer_test_real_cherrypicker.collect_train_preds(final_model, criterion, train_data_loader)
+# trainer_test_real.collect_train_preds(final_model, criterion, train_data_loader)
 
 # # final test
 # test_data_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle = False, collate_fn = collate_emodel_elastic)
-# test_loss, final_preds = trainer_test_real_cherrypicker.test_model(final_model, criterion, test_data_loader)
+# test_loss, final_preds = trainer_test_real.test_model(final_model, criterion, test_data_loader)
 
 # print('best_k-fold:', best_k)
 # print('after k-fold, averaging of val_losses:', val_losses)

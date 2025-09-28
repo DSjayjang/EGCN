@@ -34,10 +34,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # experiment parameters
-dataset_name = 'esol'
-batch_size = 32
-max_epochs = 1
-k = 2
+dataset_name = 'logvp_cp_0927'
+batch_size = 128
+max_epochs = 300
+k = 5
 
 
 def collate(samples):
@@ -113,8 +113,8 @@ model_EGCN = EGCN.Net(mc.dim_atomic_feat, 1, 3).to(device)
 
 
 # define loss function
-criterion = nn.L1Loss(reduction='sum')
-# criterion = nn.MSELoss(reduction='sum')
+# criterion = nn.L1Loss(reduction='sum')
+criterion = nn.MSELoss(reduction='sum')
 
 # train and evaluate competitors
 test_losses = dict()
