@@ -56,8 +56,8 @@ print(device)
 # experiment parameters
 dataset_name = 'logvp_cp_0927'
 batch_size = 128
-max_epochs = 300
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):
@@ -285,6 +285,7 @@ model_EGCN_5 = EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
 model_EGCN_7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
 model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+model_EGCN_elastic = EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 
 # Outer_EGCN
 model_Outer_EGCN_3 = Outer_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
@@ -293,8 +294,7 @@ model_Outer_EGCN_7 = Outer_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
 model_Outer_EGCN_10 = Outer_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
 model_Outer_EGCN_20 = Outer_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
-# Self_Feature
-model_EGCN_elastic = EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
+# # Self_Feature
 model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 
 
@@ -306,8 +306,8 @@ model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_
 
 
 # define loss function
-# criterion = nn.L1Loss(reduction='sum') # MAE
-criterion = nn.MSELoss(reduction='sum') # MSE
+criterion = nn.L1Loss(reduction='sum') # MAE
+# criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
 val_losses = dict()
