@@ -54,8 +54,8 @@ print(device)
 # experiment parameters
 dataset_name = 'lipo'
 batch_size = 32
-max_epochs = 300
-k = 5
+max_epochs = 1
+k = 2
 
 
 def collate(samples):
@@ -256,23 +256,23 @@ train_dataset, test_dataset = train_test_split(dataset, test_size = 0.2, random_
 #=========================== Embedding : 1 ===========================#
 #=====================================================================#
 
-# EGCN
-model_EGCN_3 = EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_EGCN_5 = EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_EGCN_7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+# # EGCN
+# model_EGCN_3 = EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
+# model_EGCN_5 = EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
+# model_EGCN_7 = EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+# model_EGCN_10 = EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
+# model_EGCN_20 = EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+# model_EGCN_elastic = EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 
 
-# Outer_EGCN
-model_Outer_EGCN_3 = Outer_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
-model_Outer_EGCN_5 = Outer_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
-model_Outer_EGCN_7 = Outer_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
-model_Outer_EGCN_10 = Outer_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
-model_Outer_EGCN_20 = Outer_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
+# # Outer_EGCN
+# model_Outer_EGCN_3 = Outer_EGCN_3.Net(mc.dim_atomic_feat, 1, 3).to(device)
+# model_Outer_EGCN_5 = Outer_EGCN_5.Net(mc.dim_atomic_feat, 1, 5).to(device)
+# model_Outer_EGCN_7 = Outer_EGCN_7.Net(mc.dim_atomic_feat, 1, 7).to(device)
+# model_Outer_EGCN_10 = Outer_EGCN_10.Net(mc.dim_atomic_feat, 1, 10).to(device)
+# model_Outer_EGCN_20 = Outer_EGCN_20.Net(mc.dim_atomic_feat, 1, 20).to(device)
 
 # Outer_EGCN_Elastic
-model_EGCN_elastic = EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_self_feat).to(device)
 
 
@@ -284,8 +284,8 @@ model_Outer_EGCN_elastic = Outer_EGCN_elastic.Net(mc.dim_atomic_feat, 1, mc.dim_
 
 
 # define loss function
-# criterion = nn.L1Loss(reduction='sum') # MAE
-criterion = nn.MSELoss(reduction='sum') # MSE
+criterion = nn.L1Loss(reduction='sum') # MAE
+# criterion = nn.MSELoss(reduction='sum') # MSE
 
 # train and evaluate competitors
 val_losses = dict()
@@ -329,7 +329,7 @@ test_losses = dict()
 # print('test loss (EGCN_elastic): ' + str(test_losses['EGCN_elastic']))
 
 
-# #------------------------ Outer EGCN ------------------------#
+# # #------------------------ Outer EGCN ------------------------#
 
 # # feature 3개
 # print('--------- Outer EGCN_3 ---------')
@@ -357,11 +357,13 @@ test_losses = dict()
 # print('test loss (Outer_EGCN_20): ' + str(test_losses['Outer_EGCN_20']))
 
 
-# #------------------------ Self Feature ------------------------#
+# # #------------------------ Self Feature ------------------------#
 
 # print('--------- Outer EGCN_elastic ---------')
 # test_losses['Outer_EGCN_elastic'] = trainer.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer.train_emodel, trainer.test_emodel, collate_emodel_elastic)
 # print('test loss (Outer_EGCN_elastic): ' + str(test_losses['Outer_EGCN_elastic']))
+
+# print('test_losse:', test_losses)
 
 # print('--------- Outer EGCN_elastic ---------')
 # test_losses['Outer_EGCN_elastic'] = trainer_test.cross_validation(dataset, model_Outer_EGCN_elastic, criterion, k, batch_size, max_epochs, trainer_test.train_emodel, trainer_test.test_emodel, collate_emodel_elastic)
